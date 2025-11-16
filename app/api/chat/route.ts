@@ -23,6 +23,11 @@ export async function POST(req: Request) {
             readAssignment,
         },
         stopWhen: stepCountIs(5),
+        providerOptions: {
+            openai: {
+                reasoning: { "effort": "minimal", "summary": "auto" },
+            }
+        }
     });
 
     return result.toUIMessageStreamResponse({

@@ -180,7 +180,7 @@ export const ReasoningContent = memo(
       >
         <div
           ref={contentRef}
-          className="max-h-[200px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="max-h-[75px] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           <Response className="grid gap-2">{children}</Response>
         </div>

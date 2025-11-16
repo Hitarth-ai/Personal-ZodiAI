@@ -14,20 +14,27 @@ export const pineconeIndex = pinecone.Index('bit');
 
 export async function readDocument(
     filterType: FilterType,
-    hypothetical_document: string
+    hypothetical_document: string,
+    class_no?: number
 ): Promise<string> {
-    const results = await pineconeIndex.namespace('main').searchRecords({
+    const filter: Record<string, any> = {
+        source_type: { $eq: filterType },
+    };
+    if (class_no) {
+        filter.class_no = { $eq: `${class_no}` };
+    }
+    const results = await pineconeIndex.namespace('default').searchRecords({
         query: {
             inputs: {
                 text: hypothetical_document,
             },
-            topK: 10,
-            filter: {
-                source_type: { $eq: filterType },
-            },
+            topK: 25,
+            filter: filter,
         },
         fields: ['text', 'pre_context', 'post_context', 'source_url', 'source_description', 'source_type', 'class_no', 'order'],
     });
+
+    console.log(results);
 
     const chunks = searchResultsToChunks(results);
     const sources = getSourcesFromChunks(chunks);

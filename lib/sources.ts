@@ -73,7 +73,7 @@ export function getContextFromSource(
 
     Source Description: ${source.source_description}
 
-    Source Citation: [${citationNumber}]
+    Source Citation: [${citationNumber}](${source.source_url})
 
     Excerpt from Source [${citationNumber}]:
 
