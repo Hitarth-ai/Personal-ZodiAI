@@ -143,3 +143,60 @@ export const astrologyTool = tool(
       const longitude = Number(geo.longitude);
       const timezoneId = geo.timezone_id as string | undefined;
       const tzone = timezoneIdToOffsetHours(timezoneId);
+
+      // 2) Call birth_details to get core birth data
+      const birthDetails = await callAstrologyApi("birth_details", {
+        day,
+        month,
+        year,
+        hour,
+        min: minute,
+        lat: latitude,
+        lon: longitude,
+        tzone,
+      });
+
+      // 3) Get a couple of “life report” style endpoints
+      const ascendantReport = await callAstrologyApi(
+        "general_ascendant_report",
+        {
+          day,
+          month,
+          year,
+          hour,
+          min: minute,
+          lat: latitude,
+          lon: longitude,
+          tzone,
+        }
+      );
+
+      const nakshatraReport = await callAstrologyApi(
+        "general_nakshatra_report",
+        {
+          day,
+          month,
+          year,
+          hour,
+          min: minute,
+          lat: latitude,
+          lon: longitude,
+          tzone,
+        }
+      );
+
+      // Shape the result for the model – keep it structured.
+      return {
+        type: "vedic_astrology_bundle",
+        name,
+        focus_area,
+        place,
+        timezoneId,
+        tzone,
+        birthDetails,
+        ascendantReport,
+        nakshatraReport,
+      };
+    },
+  } as any // <-- this cast makes TypeScript accept the object no matter the overloads
+);
