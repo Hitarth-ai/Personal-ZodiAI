@@ -67,7 +67,7 @@ export async function POST(req: Request) {
         tools: {
             webSearch,
             vectorDatabaseSearch,
-            astrology: astrologyTool,
+            astrologyTool,
         },
         stopWhen: stepCountIs(10),
         providerOptions: {
