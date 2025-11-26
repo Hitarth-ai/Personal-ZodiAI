@@ -1,171 +1,145 @@
 // app/api/chat/tools/astrology.ts
-
 import { tool } from 'ai';
 import { z } from 'zod';
 
-const ASTROLOGY_BASE_URL = 'https://json.astrologyapi.com/v1';
-
-function getAuthHeader() {
-  const userId = process.env.ASTROLOGY_API_USER_ID;
-  const apiKey = process.env.ASTROLOGY_API_KEY;
-
-  if (!userId || !apiKey) {
-    throw new Error(
-      'Astrology API credentials are missing. Set ASTROLOGY_API_USER_ID and ASTROLOGY_API_KEY in .env.local'
-    );
-  }
-
-  const token = Buffer.from(`${userId}:${apiKey}`).toString('base64');
-  return `Basic ${token}`;
-}
-
 /**
- * Generic helper to call AstrologyAPI endpoints.
+ * ZodiAI Astrology Tool
+ * The model will call this when it needs a Vedic astrology prediction.
  */
-async function callAstrologyApi(endpoint: string, body: unknown) {
-  const res = await fetch(`${ASTROLOGY_BASE_URL}/${endpoint}`, {
-    method: 'POST',
-    headers: {
-      authorization: getAuthHeader(),
-      'Content-Type': 'application/json',
-      'Accept-Language': 'en',
-    },
-    body: JSON.stringify(body ?? {}),
-  });
+export const astrologyTool = tool(
+  {
+    description:
+      'Call the Indian Astrology API to generate a slightly ominous but still friendly prediction for the user based on their birth details and question.',
+    // NOTE: keep the name `inputSchema` (or `parameters`) the same as in web-search.ts
+    inputSchema: z.object({
+      name: z.string().describe('Full name of the user'),
+      day: z.number().int().min(1).max(31).describe('Day of birth'),
+      month: z.number().int().min(1).max(12).describe('Month of birth'),
+      year: z.number().int().min(1900).max(2100).describe('Year of birth'),
+      hour: z
+        .number()
+        .int()
+        .min(0)
+        .max(23)
+        .describe('Hour of birth in 24-hour format'),
+      minute: z
+        .number()
+        .int()
+        .min(0)
+        .max(59)
+        .describe('Minute of birth'),
 
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`AstrologyAPI error (${res.status}): ${text}`);
-  }
+      // For now we let the model pass a city string; you can later add lat/lon
+      place: z
+        .string()
+        .describe('Birth place / city as text. Do NOT include country code.'),
 
-  return res.json();
-}
+      // What kind of prediction they want
+      queryType: z
+        .enum(['daily_horoscope', 'love', 'career', 'health', 'general'])
+        .describe('Type of question the user is asking.'),
+    }),
+  },
 
-/**
- * ZodiAI astrology tool:
- *  - Takes structured birth details + place name
- *  - Internally calls:
- *    1) geo_details → lat/lon/timezone_id
- *    2) timezone_with_dst → numeric timezone offset
- *    3) either birth_details or daily_nakshatra_prediction
- *  - Returns a compact JSON structure for the model to interpret.
- */
-export const astrologyTool = tool({
-  description:
-    'Get personalised Vedic astrology insights using user birth details (DOB, time, place).',
-
-  parameters: z.object({
-    queryType: z
-      .enum(['birth_details', 'daily_nakshatra_prediction'])
-      .describe(
-        'Use "birth_details" for natal chart / life themes; use "daily_nakshatra_prediction" for today / short-term guidance.'
-      ),
-
-    name: z.string().describe('Full name of the person.'),
-
-    day: z.number().int().min(1).max(31).describe('Day of birth'),
-    month: z.number().int().min(1).max(12).describe('Month of birth (1-12)'),
-    year: z.number().int().min(1900).max(2100).describe('Year of birth'),
-
-    hour: z
-      .number()
-      .int()
-      .min(0)
-      .max(23)
-      .describe('Hour of birth in 24h format (0-23). If unknown, use 12.'),
-
-    minute: z
-      .number()
-      .int()
-      .min(0)
-      .max(59)
-      .describe('Minute of birth (0-59). If unknown, use 0.'),
-
-    place: z
-      .string()
-      .describe('City and country of birth, e.g. "Mumbai, India".'),
-  }),
-
-  /**
-   * The AI SDK will call this when the model chooses this tool.
-   */
-  execute: async (input) => {
-    const { name, day, month, year, hour, minute, place, queryType } = input;
-
-    // 1) Lookup location (lat/lon + timezone_id)
-    const geoResp = await callAstrologyApi('geo_details', {
+  // 👇 SECOND ARGUMENT = the execute function
+  async (input) => {
+    const {
+      name,
+      day,
+      month,
+      year,
+      hour,
+      minute,
       place,
-      maxRows: 1,
-    });
+      queryType,
+    } = input;
 
-    if (!geoResp?.geonames?.length) {
+    // Read your AstrologyAPI credentials from environment variables
+    // Set these in Vercel as:
+    // ASTROLOGY_API_USER_ID = 647810
+    // ASTROLOGY_API_KEY    = your test API key (do NOT hardcode in Git)
+    const userId = process.env.ASTROLOGY_API_USER_ID;
+    const apiKey = process.env.ASTROLOGY_API_KEY;
+
+    if (!userId || !apiKey) {
+      // This result will be shown in the Tool UI if something is misconfigured
       return {
         type: 'error',
-        message: `Could not find location "${place}". Ask the user to try nearest major city.`,
+        message:
+          'Astrology API credentials are missing. Please set ASTROLOGY_API_USER_ID and ASTROLOGY_API_KEY in environment variables.',
       };
     }
 
-    const location = geoResp.geonames[0];
-    const latitude = Number(location.latitude);
-    const longitude = Number(location.longitude);
+    // Build Basic Auth header
+    const authHeader =
+      'Basic ' + Buffer.from(`${userId}:${apiKey}`).toString('base64');
 
-    // 2) Lookup timezone offset for the given date
-    const tzResp = await callAstrologyApi('timezone_with_dst', {
-      latitude,
-      longitude,
-      // mm-dd-yyyy as per docs
-      date: `${month}-${day}-${year}`,
-    });
+    // CHOOSE an AstrologyAPI endpoint you like; example:
+    // - /v1/vedic/astro_details
+    // - /v1/vedic/daily_predictions
+    //
+    // Here I’ll assume something like a generic “basic horoscope” endpoint.
+    // You can swap the URL with the exact one from their docs.
+    const endpoint = 'https://json.astrologyapi.com/v1/basic_horoscope';
 
-    const tzone =
-      typeof tzResp?.timezone === 'number' ? tzResp.timezone : 5.5; // fallback for safety
+    // AstrologyAPI expects x-www-form-urlencoded body
+    const formData = new URLSearchParams();
+    formData.append('name', name);
+    formData.append('day', day.toString());
+    formData.append('month', month.toString());
+    formData.append('year', year.toString());
+    formData.append('hour', hour.toString());
+    formData.append('min', minute.toString());
+    formData.append('place', place);
+    formData.append('question_type', queryType);
 
-    // 3) Main astrology endpoint
-    if (queryType === 'birth_details') {
-      const birth = await callAstrologyApi('birth_details', {
-        day,
-        month,
-        year,
-        hour,
-        min: minute,
-        lat: latitude,
-        lon: longitude,
-        tzone,
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          Authorization: authHeader,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData.toString(),
       });
 
-      return {
-        type: 'birth_details',
-        name,
-        location,
-        timezone: tzone,
-        rawBirth: birth,
-      };
-    }
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        return {
+          type: 'error',
+          message: `Astrology API error: ${res.status} ${res.statusText} – ${text}`,
+        };
+      }
 
-    if (queryType === 'daily_nakshatra_prediction') {
-      const prediction = await callAstrologyApi('daily_nakshatra_prediction', {
-        day,
-        month,
-        year,
-        hour,
-        min: minute,
-        lat: latitude,
-        lon: longitude,
-        tzone,
-      });
+      const data = (await res.json()) as any;
+
+      // Shape this for the model: slightly spooky but not terrifying.
+      const rawPrediction =
+        data?.prediction ||
+        data?.summary ||
+        data?.message ||
+        JSON.stringify(data);
 
       return {
-        type: 'daily_nakshatra_prediction',
+        type: 'success',
         name,
-        location,
-        timezone: tzone,
-        rawPrediction: prediction,
+        location: place,
+        timezone: data?.timezone || 'unknown',
+        rawBirth: {
+          day,
+          month,
+          year,
+          hour,
+          minute,
+          place,
+        },
+        rawPrediction,
+      };
+    } catch (err: any) {
+      return {
+        type: 'error',
+        message: `Failed to call Astrology API: ${err?.message ?? String(err)}`,
       };
     }
-
-    return {
-      type: 'error',
-      message: 'Unsupported queryType. Use birth_details or daily_nakshatra_prediction.',
-    };
-  },
-});
+  }
+);
