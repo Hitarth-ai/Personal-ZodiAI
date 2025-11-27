@@ -578,9 +578,6 @@ export default function Chat() {
                         ok.
                       </p>
                     </div>
-                    <p className="mt-1 text-[11px] text-slate-500">
-                      Used only to call AstrologyAPI
-                    </p>
                   </div>
 
                   <form
