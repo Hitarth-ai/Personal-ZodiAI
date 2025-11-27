@@ -16,11 +16,12 @@ import {
   Plus,
   PlusIcon,
   Square,
+  Trash2,
 } from "lucide-react";
 import { MessageWall } from "@/components/messages/message-wall";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UIMessage } from "ai";
-import { useEffect, useState, useRef, FormEvent } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   AI_NAME,
   CLEAR_CHAT_TEXT,
@@ -42,6 +43,7 @@ type Language = "en" | "hi" | "gu";
 const USER_NAME_KEY = "zodiai_user_name";
 const LANGUAGE_KEY = "zodiai_language";
 const STORAGE_KEY = "chat-messages";
+const HISTORY_KEY = "zodiai-chat-history-v1";
 
 type StorageData = {
   messages: UIMessage[];
@@ -74,8 +76,6 @@ type ChatHistoryItem = {
   createdAt: number;
   messages: UIMessage[];
 };
-
-const HISTORY_KEY = "zodiai-chat-history-v1";
 
 /* ---------- helpers for current session storage ---------- */
 
@@ -183,7 +183,7 @@ export default function Chat() {
 
   const [initialMessages] = useState<UIMessage[]>(stored.messages);
 
-  const { messages, sendMessage, status, stop, setMessages } = useChat({
+  const { messages, sendMessage, status, setMessages } = useChat({
     messages: initialMessages,
   });
 
@@ -193,7 +193,6 @@ export default function Chat() {
     setDurations(stored.durations);
     setMessages(stored.messages);
 
-    // Load profile preferences + history
     if (typeof window !== "undefined") {
       try {
         const savedName = localStorage.getItem(USER_NAME_KEY);
@@ -324,33 +323,37 @@ export default function Chat() {
     toast.success("Birth details sent to ZodiAI.");
   };
 
+  const archiveCurrentChatToHistory = () => {
+    if (messages.length === 0) return;
+
+    const now = Date.now();
+    const nameForHistory =
+      birthDetails.name || userName || "Anonymous seeker";
+
+    const historyItem: ChatHistoryItem = {
+      id: `hist-${now}`,
+      userName: nameForHistory,
+      createdAt: now,
+      messages: messages,
+    };
+
+    setHistory((prev) => {
+      const next = [historyItem, ...prev].slice(0, 5); // keep max 5
+      saveHistoryToStorage(next);
+      return next;
+    });
+  };
+
   const clearChat = () => {
-    // Archive current chat as a history item (max 5)
-    if (messages.length > 0) {
-      const now = Date.now();
-      const nameForHistory =
-        birthDetails.name || userName || "Anonymous seeker";
-
-      const historyItem: ChatHistoryItem = {
-        id: `hist-${now}`,
-        userName: nameForHistory,
-        createdAt: now,
-        messages: messages,
-      };
-
-      setHistory((prev) => {
-        const next = [historyItem, ...prev].slice(0, 5);
-        saveHistoryToStorage(next);
-        return next;
-      });
-    }
+    // Save current chat as previous
+    archiveCurrentChatToHistory();
 
     const newMessages: UIMessage[] = [];
     const newDurations: Record<string, number> = {};
     setMessages(newMessages);
     setDurations(newDurations);
     saveMessagesToStorage(newMessages, newDurations);
-    toast.success("Chat cleared");
+    toast.success("New chat started");
   };
 
   const handleShareChat = async () => {
@@ -378,6 +381,24 @@ export default function Chat() {
       console.error("Failed to copy chat:", error);
       toast.error("Could not copy chat");
     }
+  };
+
+  const openHistoryChat = (item: ChatHistoryItem) => {
+    setMessages(item.messages);
+    setDurations({});
+    saveMessagesToStorage(item.messages, {});
+    toast.success(
+      `Opened chat for ${item.userName || "previous seeker"}. New messages will continue from this thread.`
+    );
+  };
+
+  const deleteHistoryItem = (id: string) => {
+    setHistory((prev) => {
+      const next = prev.filter((h) => h.id !== id);
+      saveHistoryToStorage(next);
+      return next;
+    });
+    toast.success("Previous chat deleted");
   };
 
   const formState = form.formState;
@@ -454,8 +475,8 @@ export default function Chat() {
 
               {history.length === 0 ? (
                 <p className="text-[11px] text-slate-500 pr-1">
-                  You don&apos;t have previous chats yet. When you click{" "}
-                  <span className="font-medium">Clear chat</span>, the full
+                  You don&apos;t have previous chats yet. When you start a{" "}
+                  <span className="font-medium">New chat</span>, the finished
                   conversation will be saved here (up to 5).
                 </p>
               ) : (
@@ -465,21 +486,46 @@ export default function Chat() {
                       key={item.id}
                       className="rounded-xl border border-orange-100 bg-orange-50/80 px-3 py-2 text-[11px] leading-snug"
                     >
-                      <div className="font-medium text-slate-900 truncate">
-                        {item.userName || "Anonymous seeker"}
+                      <div className="mb-1 flex items-start justify-between gap-2">
+                        <div>
+                          <div className="font-medium text-slate-900 truncate">
+                            {item.userName || "Anonymous seeker"}
+                          </div>
+                          <div className="text-[10px] text-slate-500">
+                            {new Date(item.createdAt).toLocaleString(
+                              undefined,
+                              {
+                                month: "short",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteHistoryItem(item.id);
+                          }}
+                          className="rounded-full p-1 text-slate-400 hover:bg-orange-100 hover:text-slate-700"
+                          aria-label="Delete chat"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
                       </div>
-                      <div className="text-[10px] text-slate-500">
-                        {new Date(item.createdAt).toLocaleString(undefined, {
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </div>
-                      <div className="mt-1 h-[2.6em] overflow-hidden text-ellipsis text-[11px] text-slate-700">
+                      <div className="mb-2 h-[2.6em] overflow-hidden text-ellipsis text-[11px] text-slate-700">
                         {getFirstUserLine(item.messages) ||
                           "No question text available."}
                       </div>
+                      <button
+                        type="button"
+                        onClick={() => openHistoryChat(item)}
+                        className="w-full rounded-full bg-white/90 px-2 py-1 text-[11px] font-medium text-slate-700 hover:bg-white"
+                      >
+                        Open chat
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -697,7 +743,7 @@ export default function Chat() {
                     className="inline-flex items-center gap-1 rounded-full border border-orange-100 bg-white/70 px-2 py-1 text-[11px] font-medium text-slate-600 hover:bg-orange-50"
                   >
                     <Eraser className="h-3 w-3" />
-                    {CLEAR_CHAT_TEXT}
+                    {CLEAR_CHAT_TEXT || "New chat"}
                   </button>
                   {status === "streaming" ? (
                     <div className="flex items-center gap-1">
