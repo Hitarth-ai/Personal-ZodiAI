@@ -1,3 +1,4 @@
+/*
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -253,3 +254,265 @@ export default function Chat() {
     </div >
   );
 }
+
+*/
+
+// app/page.tsx
+'use client';
+
+import { FormEvent, useState } from 'react';
+import { useChat } from 'ai/react';
+import Link from 'next/link';
+
+type BirthDetails = {
+  name: string;
+  day: string;
+  month: string;
+  year: string;
+  hour: string;
+  minute: string;
+  place: string;
+};
+
+export default function HomePage() {
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    append,
+    isLoading,
+  } = useChat({
+    api: '/api/chat',
+  });
+
+  const [birthDetails, setBirthDetails] = useState<BirthDetails>({
+    name: '',
+    day: '',
+    month: '',
+    year: '',
+    hour: '',
+    minute: '',
+    place: '',
+  });
+
+  async function handleBirthSubmit(e: FormEvent) {
+    e.preventDefault();
+
+    const { name, day, month, year, hour, minute, place } = birthDetails;
+
+    if (!name || !day || !month || !year || !place) {
+      alert('Please fill at least name, date of birth, and place.');
+      return;
+    }
+
+    const safeHour = hour || '12';
+    const safeMinute = minute || '00';
+
+    const text = `My name is ${name}. My date of birth is ${day}-${month}-${year} at ${safeHour}:${safeMinute} (approx). I was born in ${place}. Please use Vedic astrology to interpret my chart and guide me.`;
+
+    await append({
+      role: 'user',
+      content: text,
+    });
+  }
+
+  return (
+    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      {/* Top nav / header */}
+      <header className="border-b border-slate-800 px-4 py-3 flex items-center justify-between">
+        <div className="flex flex-col gap-0.5">
+          <h1 className="text-xl font-bold tracking-tight">ZodiAI</h1>
+          <p className="text-xs text-slate-400">
+            AI-powered Vedic astrology assistant — built for your capstone.
+          </p>
+        </div>
+
+        <nav className="text-xs flex items-center gap-4 text-slate-400">
+          <Link href="/terms" className="hover:text-slate-100 underline-offset-4 hover:underline">
+            Terms of Use
+          </Link>
+          <span className="hidden sm:inline text-[11px]">
+            Powered by AstrologyAPI + OpenAI
+          </span>
+        </nav>
+      </header>
+
+      {/* Main two-column layout */}
+      <div className="flex-1 flex flex-col md:flex-row gap-4 p-4 max-w-6xl mx-auto w-full">
+        {/* Left column: birth details + how-to + disclaimer */}
+        <section className="md:w-80 w-full space-y-4">
+          {/* Birth details card */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+            <h2 className="text-sm font-semibold mb-2">
+              Step 1 · Enter your birth details
+            </h2>
+            <p className="text-xs text-slate-400 mb-3">
+              ZodiAI uses your date, time and place of birth to call Vedic
+              astrology APIs. If you don’t know the exact time, an approximate
+              hour is okay.
+            </p>
+
+            <form onSubmit={handleBirthSubmit} className="space-y-2">
+              <input
+                className="w-full rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                placeholder="Name"
+                value={birthDetails.name}
+                onChange={(e) =>
+                  setBirthDetails((bd) => ({ ...bd, name: e.target.value }))
+                }
+              />
+
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                  placeholder="DD"
+                  value={birthDetails.day}
+                  onChange={(e) =>
+                    setBirthDetails((bd) => ({ ...bd, day: e.target.value }))
+                  }
+                />
+                <input
+                  className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                  placeholder="MM"
+                  value={birthDetails.month}
+                  onChange={(e) =>
+                    setBirthDetails((bd) => ({ ...bd, month: e.target.value }))
+                  }
+                />
+                <input
+                  className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                  placeholder="YYYY"
+                  value={birthDetails.year}
+                  onChange={(e) =>
+                    setBirthDetails((bd) => ({ ...bd, year: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                  placeholder="Hour (0–23)"
+                  value={birthDetails.hour}
+                  onChange={(e) =>
+                    setBirthDetails((bd) => ({ ...bd, hour: e.target.value }))
+                  }
+                />
+                <input
+                  className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                  placeholder="Minute"
+                  value={birthDetails.minute}
+                  onChange={(e) =>
+                    setBirthDetails((bd) => ({ ...bd, minute: e.target.value }))
+                  }
+                />
+              </div>
+
+              <input
+                className="w-full rounded-md bg-slate-950 border border-slate-700 px-2 py-1 text-xs"
+                placeholder="Place of birth (City, Country)"
+                value={birthDetails.place}
+                onChange={(e) =>
+                  setBirthDetails((bd) => ({ ...bd, place: e.target.value }))
+                }
+              />
+
+              <button
+                type="submit"
+                className="w-full mt-1 rounded-md bg-indigo-500 hover:bg-indigo-600 text-xs font-medium py-1.5 disabled:opacity-50"
+                disabled={isLoading}
+              >
+                Send details to ZodiAI
+              </button>
+            </form>
+          </div>
+
+          {/* How-to card */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+            <h2 className="text-sm font-semibold mb-2">
+              Step 2 · Ask ZodiAI anything
+            </h2>
+            <p className="text-xs text-slate-400 mb-2">
+              After sending your details, you can ask:
+            </p>
+            <ul className="text-xs text-slate-400 space-y-1 list-disc list-inside">
+              <li>“Give me a general overview of my personality.”</li>
+              <li>“What should I focus on this week?”</li>
+              <li>“How might my strengths show up in my career?”</li>
+              <li>“What patterns should I be aware of in relationships?”</li>
+            </ul>
+          </div>
+
+          {/* Disclaimer card */}
+          <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-4">
+            <h2 className="text-xs font-semibold mb-1">Important disclaimer</h2>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              ZodiAI combines Vedic astrology rules with AI. It is for
+              reflection and entertainment — not for medical, legal or financial
+              decisions. It cannot predict the future with certainty. In a
+              crisis or mental-health emergency, do not rely on astrology;
+              contact local emergency services and trusted people around you.
+            </p>
+          </div>
+        </section>
+
+        {/* Right column: chat window */}
+        <section className="flex-1 flex flex-col rounded-xl border border-slate-800 bg-slate-900/60">
+          {/* Messages list */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+            {messages.length === 0 && (
+              <p className="text-xs text-slate-400">
+                Start by sending your birth details from the left panel. After
+                ZodiAI replies with an overview, use the box below to ask
+                follow-up questions.
+              </p>
+            )}
+
+            {messages.map((m) => (
+              <div key={m.id} className="space-y-1">
+                <div className="text-[10px] uppercase tracking-wide text-slate-400">
+                  {m.role === 'user'
+                    ? 'You'
+                    : m.role === 'assistant'
+                    ? 'ZodiAI'
+                    : m.role}
+                </div>
+                <div
+                  className={`text-xs leading-relaxed whitespace-pre-wrap rounded-md px-3 py-2 ${
+                    m.role === 'user'
+                      ? 'bg-slate-800'
+                      : 'bg-slate-950 border border-slate-800'
+                  }`}
+                >
+                  {m.content}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Input bar */}
+          <form
+            onSubmit={handleSubmit}
+            className="border-t border-slate-800 flex items-center gap-2 px-3 py-2"
+          >
+            <input
+              className="flex-1 rounded-md bg-slate-950 border border-slate-700 px-3 py-2 text-sm"
+              placeholder="Ask ZodiAI a question…"
+              value={input}
+              onChange={handleInputChange}
+            />
+            <button
+              type="submit"
+              className="rounded-md bg-indigo-500 hover:bg-indigo-600 text-xs font-medium px-3 py-2 disabled:opacity-50"
+              disabled={isLoading}
+            >
+              Send
+            </button>
+          </form>
+        </section>
+      </div>
+    </main>
+  );
+}
+
