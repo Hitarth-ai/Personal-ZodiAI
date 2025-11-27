@@ -12,6 +12,8 @@ type TalkingPanditProps = {
   sendMessage: (args: { text: string }) => void;
   enabled?: boolean;
   language?: VoiceLanguage;
+  /** true while the LLM is still generating the answer */
+  isStreaming?: boolean;
 };
 
 // ---------- helpers ----------
@@ -36,26 +38,19 @@ function extractTextFromMessage(message: UIMessage): string {
 function getSpokenSummary(fullText: string): string {
   if (!fullText) return "";
 
+  // basic sentence split
   const sentences = fullText.split(/(?<=[.!?])\s+/);
-  const short = sentences.slice(0, 3).join(" ");
+  const short = sentences.slice(0, 2).join(" "); // first 2 sentences
 
-  const trimmed = short.length > 350 ? short.slice(0, 347) + "..." : short;
+  const trimmed = short.length > 260 ? short.slice(0, 257) + "..." : short;
 
-  // make it feel like a spoken response
-  return `Sun beta, main short mein bataun: ${trimmed}`;
+  // make it feel like a spoken reply but without extra filler
+  return trimmed;
 }
 
-function localeFor(language: VoiceLanguage): string {
-  switch (language) {
-    case "hi":
-      return "hi-IN";
-    case "gu":
-      return "gu-IN";
-    case "hinglish":
-    case "en":
-    default:
-      return "en-IN"; // Indian English works well for Hinglish
-  }
+// For now use Indian English for all – your content is mostly English/Hinglish
+function localeFor(_language: VoiceLanguage): string {
+  return "en-IN";
 }
 
 // ---------- avatar ----------
@@ -101,6 +96,7 @@ export function TalkingPandit({
   sendMessage,
   enabled = true,
   language = "en",
+  isStreaming = false,
 }: TalkingPanditProps) {
   const [isClient, setIsClient] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -218,10 +214,10 @@ export function TalkingPandit({
 
     const intro =
       language === "gu"
-        ? "Kem cho beta? Hu ZodiAI chu, tamaro AI pandit. Shu puchvu chho?"
+        ? "Kem cho beta? I am ZodiAI, tamaro AI pandit. Shu puchvu chho?"
         : language === "hi" || language === "hinglish"
         ? "Namaste beta, main ZodiAI hoon, tumhara AI Pandit. Bolo beta, kya puchna hai?"
-        : "Hello beta, I'm ZodiAI, your AI Pandit. Tell me beta, what's your question?";
+        : "Hello beta, I'm ZodiAI, your AI Pandit. Tell me, what's your question?";
 
     const utterance = new SpeechSynthesisUtterance(intro);
     utterance.lang = localeFor(language);
@@ -242,6 +238,7 @@ export function TalkingPandit({
 
   useEffect(() => {
     if (!isClient || !ttsEnabled || !enabled) return;
+    if (isStreaming) return; // wait until answer finished streaming
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     if (messages.length === 0) return;
 
@@ -272,7 +269,15 @@ export function TalkingPandit({
     window.speechSynthesis.speak(utterance);
     utteranceRef.current = utterance;
     setLastSpokenId(last.id);
-  }, [messages, isClient, ttsEnabled, enabled, lastSpokenId, language]);
+  }, [
+    messages,
+    isClient,
+    ttsEnabled,
+    enabled,
+    lastSpokenId,
+    language,
+    isStreaming,
+  ]);
 
   if (!isClient || !enabled) return null;
 
