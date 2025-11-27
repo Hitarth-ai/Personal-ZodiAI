@@ -9,12 +9,24 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useChat } from "@ai-sdk/react";
-import { ArrowUp, Eraser, Loader2, Plus, PlusIcon, Square } from "lucide-react";
+import {
+  ArrowUp,
+  Eraser,
+  Loader2,
+  Plus,
+  PlusIcon,
+  Square,
+} from "lucide-react";
 import { MessageWall } from "@/components/messages/message-wall";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UIMessage } from "ai";
-import { useEffect, useState, useRef } from "react";
-import { AI_NAME, CLEAR_CHAT_TEXT, OWNER_NAME, WELCOME_MESSAGE } from "@/config";
+import { useEffect, useState, useRef, FormEvent } from "react";
+import {
+  AI_NAME,
+  CLEAR_CHAT_TEXT,
+  OWNER_NAME,
+  WELCOME_MESSAGE,
+} from "@/config";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -35,6 +47,37 @@ type StorageData = {
   messages: UIMessage[];
   durations: Record<string, number>;
 };
+
+type BirthDetails = {
+  name: string;
+  day: string;
+  month: string;
+  year: string;
+  hour: string;
+  minute: string;
+  place: string;
+};
+
+const EMPTY_BIRTH_DETAILS: BirthDetails = {
+  name: "",
+  day: "",
+  month: "",
+  year: "",
+  hour: "",
+  minute: "",
+  place: "",
+};
+
+type ChatHistoryItem = {
+  id: string;
+  userName: string;
+  createdAt: number;
+  messages: UIMessage[];
+};
+
+const HISTORY_KEY = "zodiai-chat-history-v1";
+
+/* ---------- helpers for current session storage ---------- */
 
 const loadMessagesFromStorage = (): {
   messages: UIMessage[];
@@ -82,6 +125,17 @@ const saveMessagesToStorage = (
   }
 };
 
+/* ---------- helpers for history storage ---------- */
+
+const saveHistoryToStorage = (items: ChatHistoryItem[]) => {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
+  } catch (error) {
+    console.error("Failed to save chat history:", error);
+  }
+};
+
 const getMessageText = (message: UIMessage): string => {
   const anyMessage: any = message;
   if (typeof anyMessage.text === "string") return anyMessage.text;
@@ -98,6 +152,13 @@ const getMessageText = (message: UIMessage): string => {
   return "";
 };
 
+const getFirstUserLine = (messages: UIMessage[]): string => {
+  const userMsg = messages.find((m) => m.role === "user");
+  if (!userMsg) return "";
+  const text = getMessageText(userMsg);
+  return text.length > 100 ? text.slice(0, 97) + "…" : text;
+};
+
 export default function Chat() {
   const [isClient, setIsClient] = useState(false);
   const [durations, setDurations] = useState<Record<string, number>>({});
@@ -107,6 +168,12 @@ export default function Chat() {
   const [userName, setUserName] = useState<string>("");
   const [language, setLanguage] = useState<Language>("en");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [birthDetails, setBirthDetails] = useState<BirthDetails>(
+    EMPTY_BIRTH_DETAILS
+  );
+
+  // History of previous chats (max 5)
+  const [history, setHistory] = useState<ChatHistoryItem[]>([]);
 
   // Load stored messages on first render (SSR-safe)
   const stored =
@@ -126,17 +193,27 @@ export default function Chat() {
     setDurations(stored.durations);
     setMessages(stored.messages);
 
-    // Load profile preferences
+    // Load profile preferences + history
     if (typeof window !== "undefined") {
       try {
         const savedName = localStorage.getItem(USER_NAME_KEY);
-        const savedLang = localStorage.getItem(LANGUAGE_KEY) as Language | null;
+        const savedLang = localStorage.getItem(LANGUAGE_KEY) as
+          | Language
+          | null;
         if (savedName) setUserName(savedName);
         if (savedLang === "en" || savedLang === "hi" || savedLang === "gu") {
           setLanguage(savedLang);
         }
+
+        const rawHistory = localStorage.getItem(HISTORY_KEY);
+        if (rawHistory) {
+          const parsed = JSON.parse(rawHistory);
+          if (Array.isArray(parsed)) {
+            setHistory(parsed as ChatHistoryItem[]);
+          }
+        }
       } catch (error) {
-        console.error("Failed to load user profile:", error);
+        console.error("Failed to load user profile/history:", error);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -206,23 +283,68 @@ export default function Chat() {
     },
   });
 
+  const makeLanguagePrefix = () =>
+    language === "hi"
+      ? "[Language: Hindi] "
+      : language === "gu"
+      ? "[Language: Gujarati] "
+      : "[Language: English] ";
+
   const onSubmit = (data: z.infer<typeof formSchema>) => {
-    const langPrefix =
-      language === "hi"
-        ? "[Language: Hindi] "
-        : language === "gu"
-        ? "[Language: Gujarati] "
-        : "[Language: English] ";
-
+    const langPrefix = makeLanguagePrefix();
     const namePrefix = userName ? `User name: ${userName}. ` : "";
-
     const fullText = `${langPrefix}${namePrefix}${data.message}`;
 
     sendMessage({ text: fullText });
     form.reset();
   };
 
+  // Step 1: birth details submit
+  const handleBirthSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const { name, day, month, year, hour, minute, place } = birthDetails;
+
+    if (!name || !day || !month || !year || !place) {
+      toast.error(
+        "Please fill at least your name, full birth date and place of birth."
+      );
+      return;
+    }
+
+    setUserName(name);
+
+    const safeHour = hour || "12";
+    const safeMinute = minute || "00";
+
+    const baseText = `My name is ${name}. My date of birth is ${day}-${month}-${year} at ${safeHour}:${safeMinute} (approx). I was born in ${place}. Please use Vedic astrology to interpret my chart and give me a clear initial overview, then show me a short menu of what ZodiAI can help me with (career, relationships, health, timing, etc.).`;
+
+    const fullText = `${makeLanguagePrefix()}${baseText}`;
+
+    sendMessage({ text: fullText });
+    toast.success("Birth details sent to ZodiAI.");
+  };
+
   const clearChat = () => {
+    // Archive current chat as a history item (max 5)
+    if (messages.length > 0) {
+      const now = Date.now();
+      const nameForHistory =
+        birthDetails.name || userName || "Anonymous seeker";
+
+      const historyItem: ChatHistoryItem = {
+        id: `hist-${now}`,
+        userName: nameForHistory,
+        createdAt: now,
+        messages: messages,
+      };
+
+      setHistory((prev) => {
+        const next = [historyItem, ...prev].slice(0, 5);
+        saveHistoryToStorage(next);
+        return next;
+      });
+    }
+
     const newMessages: UIMessage[] = [];
     const newDurations: Record<string, number> = {};
     setMessages(newMessages);
@@ -258,10 +380,6 @@ export default function Chat() {
     }
   };
 
-  const sidebarSummary = userName
-    ? `Stored locally for ${userName}. Only you can see this chat on this browser.`
-    : "Add your name to personalise your reading. Your chats stay only in this browser.";
-
   const formState = form.formState;
 
   return (
@@ -279,7 +397,7 @@ export default function Chat() {
             </button>
             <div className="flex flex-col">
               <span className="text-sm font-semibold tracking-tight text-slate-900">
-                ZodiAI · {AI_NAME}
+                ZodiAI – Your AI Panditji
               </span>
               <span className="text-[11px] text-slate-500">
                 Gentle Vedic insights — not deterministic predictions.
@@ -288,8 +406,8 @@ export default function Chat() {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Language selector (desktop) */}
-            <div className="hidden items-center gap-2 rounded-full border border-orange-200 bg-orange-50/80 px-3 py-1 text-[11px] text-slate-700 sm:flex">
+            {/* Language selector */}
+            <div className="flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50/80 px-3 py-1 text-[11px] text-slate-700">
               <span className="font-medium text-orange-700">Language</span>
               <select
                 className="bg-transparent text-[11px] text-slate-800 outline-none"
@@ -322,91 +440,185 @@ export default function Chat() {
         </header>
 
         <div className="flex flex-1 overflow-hidden">
-          {/* Left sidebar */}
+          {/* Left sidebar – previous chats */}
           {sidebarOpen && (
-            <aside className="hidden h-full w-64 flex-shrink-0 flex-col border-r border-orange-100 bg-white/80 px-3 py-4 text-xs text-slate-700 sm:flex">
-              <div className="mb-4 flex items-center justify-between">
+            <aside className="hidden h-full w-72 flex-shrink-0 flex-col border-r border-orange-100 bg-white/80 px-3 py-4 text-xs text-slate-700 sm:flex">
+              <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm font-semibold text-slate-900">
-                  Your session
+                  Previous chats
                 </p>
+                <span className="text-[10px] text-slate-500">
+                  {history.length}/5
+                </span>
               </div>
 
-              <FieldGroup className="space-y-3">
-                <Field>
-                  <FieldLabel
-                    htmlFor="user-name"
-                    className="text-[11px] text-slate-600"
-                  >
-                    Name
-                  </FieldLabel>
-                  <Input
-                    id="user-name"
-                    placeholder="Type your name"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="h-8 rounded-xl border-orange-100 bg-white/90 px-3 text-xs"
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel className="text-[11px] text-slate-600">
-                    Language
-                  </FieldLabel>
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setLanguage("en")}
-                      className={`flex-1 rounded-full px-2 py-1 text-[11px] ${
-                        language === "en"
-                          ? "bg-orange-500 text-white"
-                          : "bg-orange-50 text-slate-700"
-                      }`}
+              {history.length === 0 ? (
+                <p className="text-[11px] text-slate-500 pr-1">
+                  You don&apos;t have previous chats yet. When you click{" "}
+                  <span className="font-medium">Clear chat</span>, the full
+                  conversation will be saved here (up to 5).
+                </p>
+              ) : (
+                <div className="space-y-2 overflow-y-auto pr-1">
+                  {history.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-orange-100 bg-orange-50/80 px-3 py-2 text-[11px] leading-snug"
                     >
-                      English
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLanguage("hi")}
-                      className={`flex-1 rounded-full px-2 py-1 text-[11px] ${
-                        language === "hi"
-                          ? "bg-orange-500 text-white"
-                          : "bg-orange-50 text-slate-700"
-                      }`}
-                    >
-                      हिंदी
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLanguage("gu")}
-                      className={`flex-1 rounded-full px-2 py-1 text-[11px] ${
-                        language === "gu"
-                          ? "bg-orange-500 text-white"
-                          : "bg-orange-50 text-slate-700"
-                      }`}
-                    >
-                      ગુજરાતી
-                    </button>
-                  </div>
-                </Field>
-              </FieldGroup>
+                      <div className="font-medium text-slate-900 truncate">
+                        {item.userName || "Anonymous seeker"}
+                      </div>
+                      <div className="text-[10px] text-slate-500">
+                        {new Date(item.createdAt).toLocaleString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                      <div className="mt-1 h-[2.6em] overflow-hidden text-ellipsis text-[11px] text-slate-700">
+                        {getFirstUserLine(item.messages) ||
+                          "No question text available."}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
 
-              <div className="mt-5 rounded-xl border border-orange-100 bg-orange-50/70 p-3 text-[11px] leading-relaxed">
-                <p className="font-medium text-orange-800">How ZodiAI helps</p>
-                <ul className="mt-1 list-disc space-y-1 pl-4">
-                  <li>Birth-chart based life themes</li>
-                  <li>Upcoming planetary periods</li>
-                  <li>Context for daily decisions</li>
-                </ul>
-              </div>
-
-              <p className="mt-3 text-[10px] text-slate-500">{sidebarSummary}</p>
+              <p className="mt-3 text-[10px] text-slate-500">
+                Chats are stored only in this browser (localStorage). New chats
+                replace the oldest once you exceed 5.
+              </p>
             </aside>
           )}
 
           {/* Main chat area */}
           <section className="flex flex-1 flex-col">
             <div className="flex-1 overflow-y-auto px-4 pt-4 pb-3 flex justify-center">
-              <div className="w-full max-w-3xl">
+              <div className="w-full max-w-3xl space-y-4">
+                {/* Step 1 – Birth details card */}
+                <section className="rounded-3xl border border-slate-200 bg-white px-5 py-5 shadow-sm">
+                  <div className="mb-4 flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-base font-semibold text-slate-900">
+                        Step 1 · Enter your birth details
+                      </h2>
+                      <p className="mt-1 text-sm text-slate-600">
+                        ZodiAI uses your date, time and place of birth to call
+                        Vedic astrology APIs and interpret your chart. If you
+                        don&apos;t know the exact time, an approximate hour is
+                        ok.
+                      </p>
+                    </div>
+                    <p className="mt-1 text-[11px] text-slate-500">
+                      Used only to call AstrologyAPI
+                    </p>
+                  </div>
+
+                  <form
+                    onSubmit={handleBirthSubmit}
+                    className="space-y-3 text-sm"
+                  >
+                    <Input
+                      className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                      placeholder="Name"
+                      value={birthDetails.name}
+                      onChange={(e) =>
+                        setBirthDetails((bd) => ({
+                          ...bd,
+                          name: e.target.value,
+                        }))
+                      }
+                    />
+
+                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+                      <Input
+                        className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                        placeholder="DD"
+                        value={birthDetails.day}
+                        onChange={(e) =>
+                          setBirthDetails((bd) => ({
+                            ...bd,
+                            day: e.target.value,
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                        placeholder="MM"
+                        value={birthDetails.month}
+                        onChange={(e) =>
+                          setBirthDetails((bd) => ({
+                            ...bd,
+                            month: e.target.value,
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                        placeholder="YYYY"
+                        value={birthDetails.year}
+                        onChange={(e) =>
+                          setBirthDetails((bd) => ({
+                            ...bd,
+                            year: e.target.value,
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                        placeholder="Hour (0–23)"
+                        value={birthDetails.hour}
+                        onChange={(e) =>
+                          setBirthDetails((bd) => ({
+                            ...bd,
+                            hour: e.target.value,
+                          }))
+                        }
+                      />
+                      <Input
+                        className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                        placeholder="Minute"
+                        value={birthDetails.minute}
+                        onChange={(e) =>
+                          setBirthDetails((bd) => ({
+                            ...bd,
+                            minute: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+
+                    <Input
+                      className="h-11 rounded-2xl border-slate-200 bg-white px-4 text-sm text-slate-900"
+                      placeholder="Place of birth (City, Country)"
+                      value={birthDetails.place}
+                      onChange={(e) =>
+                        setBirthDetails((bd) => ({
+                          ...bd,
+                          place: e.target.value,
+                        }))
+                      }
+                    />
+
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                      <p className="text-[11px] text-slate-500">
+                        This information is used only inside this browser
+                        session so ZodiAI can personalise responses. Do not
+                        enter passwords, ID numbers or other sensitive data.
+                      </p>
+                      <Button
+                        type="submit"
+                        className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800"
+                        disabled={status === "streaming"}
+                      >
+                        Send details to ZodiAI
+                      </Button>
+                    </div>
+                  </form>
+                </section>
+
+                {/* Messages */}
                 <MessageWall
                   messages={messages}
                   status={status}
@@ -441,7 +653,7 @@ export default function Chat() {
                               {...field}
                               id="chat-form-message"
                               className="w-full min-h-[72px] max-h-40 resize-none rounded-2xl border border-orange-100 bg-white/90 px-4 py-3 pr-12 text-sm text-slate-900 placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
-                              placeholder="Share your birth details and question. Press Shift+Enter for a new line."
+                              placeholder="Ask ZodiAI a question about your chart. Press Shift+Enter for a new line."
                               disabled={status === "streaming"}
                               aria-invalid={fieldState.invalid}
                               autoComplete="off"
@@ -513,7 +725,7 @@ export default function Chat() {
           </section>
         </div>
 
-        {/* Tiny hidden icons so imports aren't "unused" if your TS config is strict */}
+        {/* Tiny hidden icons so imports aren't "unused" if TS is strict */}
         <span className="hidden">
           <Plus className="h-0 w-0" />
           <PlusIcon className="h-0 w-0" />
