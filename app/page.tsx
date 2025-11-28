@@ -204,10 +204,15 @@ export default function Chat() {
   useEffect(() => {
     const conv = conversationsState.find((c) => c.id === activeId);
     if (!conv) return;
+
+    // load messages/durations/birth details only once,
+    // when the user switches chats
     setMessages(conv.messages || []);
     setDurations(conv.durations || {});
     setBirthDetails(conv.birthDetails || EMPTY_BIRTH);
-  }, [activeId, conversationsState, setMessages]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId]);
+
 
   // persist conversations
   useEffect(() => {
