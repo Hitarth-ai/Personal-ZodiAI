@@ -65,25 +65,21 @@ function PanditAvatar({
   const active = listening || speaking;
 
   return (
-    <div className="relative h-14 w-14">
+    <div className="relative h-14 w-14 flex-shrink-0">
       <div
-        className={`absolute inset-0 rounded-full bg-gradient-to-br from-orange-200 to-orange-50 shadow-lg transition ${
-          active ? "scale-105" : "scale-100"
-        }`}
+        className={`absolute inset-0 rounded-full bg-gradient-to-br from-orange-200 to-orange-50 shadow-lg transition ${active ? "scale-105" : "scale-100"
+          }`}
       />
       <div
-        className={`absolute inset-1 rounded-full bg-white transition ${
-          active ? "ring-2 ring-orange-400" : "ring-0"
-        }`}
+        className={`absolute inset-1 rounded-full bg-white transition ${active ? "ring-2 ring-orange-400" : "ring-0"
+          }`}
       />
       <Image
-        src="/pandit-talk.gif"
+        src={speaking ? "/pandit-talk.gif" : "/Pandit.png"}
         alt="ZodiAI Panditji"
         width={56}
         height={56}
-        className={`relative h-14 w-14 rounded-full object-cover transition ${
-          speaking ? "animate-pulse" : ""
-        }`}
+        className={`relative h-14 w-14 rounded-full object-cover transition`}
       />
     </div>
   );
@@ -97,7 +93,8 @@ export function TalkingPandit({
   enabled = true,
   language = "en",
   isStreaming = false,
-}: TalkingPanditProps) {
+  className,
+}: TalkingPanditProps & { className?: string }) {
   const [isClient, setIsClient] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -166,7 +163,7 @@ export function TalkingPandit({
       hardStopSpeaking();
       try {
         recognitionRef.current?.stop();
-      } catch {}
+      } catch { }
       setIsListening(false);
     }
   }, [enabled, isClient]);
@@ -202,7 +199,7 @@ export function TalkingPandit({
   const stopListening = () => {
     try {
       recognitionRef.current?.stop();
-    } catch {}
+    } catch { }
     setIsListening(false);
   };
 
@@ -216,8 +213,8 @@ export function TalkingPandit({
       language === "gu"
         ? "Kem cho beta? I am ZodiAI, tamaro AI pandit. Shu puchvu chho?"
         : language === "hi" || language === "hinglish"
-        ? "Namaste beta, main ZodiAI hoon, tumhara AI Pandit. Bolo beta, kya puchna hai?"
-        : "Hello beta, I'm ZodiAI, your AI Pandit. Tell me, what's your question?";
+          ? "Namaste beta, main ZodiAI hoon, tumhara AI Pandit. Bolo beta, kya puchna hai?"
+          : "Hello beta, I'm ZodiAI, your AI Pandit. Tell me, what's your question?";
 
     const utterance = new SpeechSynthesisUtterance(intro);
     utterance.lang = localeFor(language);
@@ -283,14 +280,14 @@ export function TalkingPandit({
 
   const subtitle = isListening
     ? "Listening… bolo beta."
-    : "Tap mic and ask your question.";
+    : "Tap mic and ask.";
 
   return (
-    <div className="fixed bottom-24 right-4 z-40">
-      <div className="flex items-center gap-3 rounded-3xl border border-orange-100 bg-white/95 px-4 py-3 shadow-xl">
+    <div className={className}>
+      <div className="flex flex-col items-center gap-3 rounded-3xl border border-orange-100 bg-white/95 px-4 py-4 shadow-sm">
         <PanditAvatar listening={isListening} speaking={isSpeaking} />
 
-        <div className="mr-2 flex flex-col">
+        <div className="flex flex-col text-center">
           <span className="text-sm font-semibold text-slate-900">
             Talk to Panditji
           </span>
@@ -303,11 +300,10 @@ export function TalkingPandit({
             type="button"
             onClick={isListening ? stopListening : startListening}
             disabled={!speechSupported}
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md ${
-              isListening
-                ? "bg-orange-500"
-                : "bg-orange-400 hover:bg-orange-500"
-            }`}
+            className={`flex h-9 w-9 items-center justify-center rounded-full text-white shadow-md transition ${isListening
+              ? "bg-orange-500 animate-pulse"
+              : "bg-orange-400 hover:bg-orange-500"
+              }`}
             title={isListening ? "Stop listening" : "Start listening"}
           >
             {isListening ? (

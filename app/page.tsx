@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import * as z from "zod";
 import { useChat } from "@ai-sdk/react";
-import { UIMessage } from "ai";
+import type { UIMessage } from "ai";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,18 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-
 import { MessageWall } from "@/components/messages/message-wall";
 
-import { ArrowUp, Loader2, Mic, Square, Trash2, Volume2 } from "lucide-react";
+import { ArrowUp, Loader2, Mic, Square, Trash2, Volume2, Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import {
-  CLEAR_CHAT_TEXT,
-  OWNER_NAME,
-  WELCOME_MESSAGE,
-} from "@/config";
+import { CLEAR_CHAT_TEXT, OWNER_NAME, WELCOME_MESSAGE } from "@/config";
 
 // -------------------- Types & constants --------------------
 
@@ -69,41 +64,82 @@ const EMPTY_BIRTH: BirthDetails = {
   place: "",
 };
 
+// main = lighter chat bg, sidebar = darker shade (also text colour)
 const MOON_COLORS: Record<string, { main: string; sidebar: string }> = {
-  Aries: { main: "#9A463E", sidebar: "#7B3832" },
-  Taurus: { main: "#A3A78B", sidebar: "#82866F" },
-  Gemini: { main: "#F2EEE5", sidebar: "#C2BEB7" },
-  Cancer: { main: "#B8CDD2", sidebar: "#93A4A8" },
-  Leo: { main: "#C1A166", sidebar: "#9A8152" },
-  Virgo: { main: "#C28F76", sidebar: "#9B725E" },
-  Libra: { main: "#D1D1D1", sidebar: "#A7A7A7" },
-  Scorpio: { main: "#3E2C35", sidebar: "#32232A" },
-  Sagittarius: { main: "#F9E27D", sidebar: "#C7B564" },
+  Aries: { main: "#9a5f5aff", sidebar: "#461b17ff" },
+  Taurus: { main: "#A3A78B", sidebar: "#3c4026ff" },
+  Gemini: { main: "#f9ebc9ff", sidebar: "#735522ff" },
+  Cancer: { main: "#b3d3dbff", sidebar: "#1e4f5aff" },
+  Leo: { main: "#ddc69dff", sidebar: "#7e570eff" },
+  Virgo: { main: "#d5ab96ff", sidebar: "#744a35ff" },
+  Libra: { main: "#d6bdbdff", sidebar: "#502525ff" },
+  Scorpio: { main: "#ad9ca5ff", sidebar: "#301d26ff" },
+  Sagittarius: { main: "#e7ddb2ff", sidebar: "#4d431bff" },
   Capricorn: { main: "#D5E4DD", sidebar: "#AAB6B1" },
-  Aquarius: { main: "#2E5A73", sidebar: "#25485C" },
+  Aquarius: { main: "#a1cde6ff", sidebar: "#366885ff" },
   Pisces: { main: "#D8A7A1", sidebar: "#AD8681" },
 };
 
 const DEFAULT_THEME: Theme = {
   main: MOON_COLORS.Gemini.main,
   sidebar: MOON_COLORS.Gemini.sidebar,
-  text: "#111827",
+  text: MOON_COLORS.Gemini.sidebar, // darkest tone
 };
 
 const CONVERSATIONS_KEY = "zodiai-conversations-v2";
 const ACTIVE_CONV_KEY = "zodiai-active-conversation-id";
+const MOON_KEY = "zodiai-moon-sign";
+
+const STATIC_DEFAULT_CONVERSATION: Conversation = {
+  id: "initial",
+  title: "New chat",
+  createdAt: "2024-01-01T00:00:00.000Z", // Fixed date for hydration match
+  messages: [],
+  durations: {},
+  birthDetails: EMPTY_BIRTH,
+};
 
 // -------------------- Helpers --------------------
 
 function getThemeFromLocalStorage(): Theme {
   if (typeof window === "undefined") return DEFAULT_THEME;
-  const moon = window.localStorage.getItem("zodiai-moon-sign") || "Gemini";
-  const base = MOON_COLORS[moon] ?? MOON_COLORS.Gemini;
-  return {
-    main: base.main,
-    sidebar: base.sidebar,
-    text: base.sidebar, // darkest tone of that palette
-  };
+  try {
+    const moon = window.localStorage.getItem(MOON_KEY) || "Gemini";
+    const base =
+      MOON_COLORS[moon as keyof typeof MOON_COLORS] ?? MOON_COLORS.Gemini;
+    return {
+      main: base.main,
+      sidebar: base.sidebar,
+      text: base.sidebar, // text always = darkest tone
+    };
+  } catch {
+    return DEFAULT_THEME;
+  }
+}
+
+function detectMoonSign(text: string): string | null {
+  // Broad regex to find "Moon", "Rashi", or "Sign" followed by a zodiac sign within ~100 chars
+  // Matches: "Moon sign is Aries", "Your Rashi is **Taurus**", "Moon in Gemini", "Aries Moon"
+  const signs = Object.keys(MOON_COLORS).join("|");
+
+  // 1. Look for "Moon/Rashi/Sign ... [Sign]"
+  // \b ensures we match whole words (e.g. not "Cancerous")
+  const forwardRegex = new RegExp(`(?:Moon|Rashi|Sign).{0,100}?\\b(${signs})\\b`, "i");
+  const forwardMatch = text.match(forwardRegex);
+
+  if (forwardMatch && forwardMatch[1]) {
+    return forwardMatch[1].charAt(0).toUpperCase() + forwardMatch[1].slice(1).toLowerCase();
+  }
+
+  // 2. Look for "[Sign] ... Moon/Rashi" (e.g. "Aries Moon")
+  const backwardRegex = new RegExp(`\\b(${signs})\\b.{0,50}?(?:Moon|Rashi)`, "i");
+  const backwardMatch = text.match(backwardRegex);
+
+  if (backwardMatch && backwardMatch[1]) {
+    return backwardMatch[1].charAt(0).toUpperCase() + backwardMatch[1].slice(1).toLowerCase();
+  }
+
+  return null;
 }
 
 function loadConversations(): {
@@ -126,44 +162,62 @@ function loadConversations(): {
 
 function saveConversations(conversations: Conversation[], activeId: string) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
-  window.localStorage.setItem(ACTIVE_CONV_KEY, activeId);
+  try {
+    window.localStorage.setItem(CONVERSATIONS_KEY, JSON.stringify(conversations));
+    window.localStorage.setItem(ACTIVE_CONV_KEY, activeId);
+  } catch (error) {
+    console.error("Failed to save conversations to localStorage:", error);
+    // Optionally toast.error("Could not save chat history. Storage full?");
+  }
 }
 
 function extractPlainText(message: UIMessage): string {
   if (!message.parts) return "";
   return message.parts
-    .filter((p) => p.type === "text")
+    .filter((p: any) => p.type === "text")
     .map((p: any) => p.text ?? "")
     .join(" ");
+}
+
+// short conversational summary for TTS
+function getSpokenSummary(fullText: string): string {
+  if (!fullText) return "";
+
+  // basic sentence split
+  const sentences = fullText.split(/(?<=[.!?])\s+/);
+  const short = sentences.slice(0, 2).join(" "); // first 2 sentences
+
+  const trimmed = short.length > 260 ? short.slice(0, 257) + "..." : short;
+
+  // make it feel like a spoken reply but without extra filler
+  return trimmed;
 }
 
 // -------------------- Component --------------------
 
 export default function Chat() {
+  // 🌙 THEME DRIVEN BY MOON SIGN FROM LOCALSTORAGE
   const [theme, setTheme] = useState<Theme>(DEFAULT_THEME);
 
-  const [{ conversations, activeId: initialActive }] = useState(() =>
-    loadConversations()
-  );
+  // initial theme on mount
+  useEffect(() => {
+    setTheme(getThemeFromLocalStorage());
+  }, []);
 
-  const [conversationsState, setConversations] = useState<Conversation[]>(
-    conversations.length
-      ? conversations
-      : [
-          {
-            id: "initial",
-            title: "New chat",
-            createdAt: new Date().toISOString(),
-            messages: [],
-            durations: {},
-          },
-        ]
-  );
+  const [conversationsState, setConversations] = useState<Conversation[]>([
+    STATIC_DEFAULT_CONVERSATION,
+  ]);
 
   const [activeId, setActiveId] = useState<string>(
-    initialActive || conversationsState[0].id
+    STATIC_DEFAULT_CONVERSATION.id
   );
+  const activeIdRef = useRef(activeId);
+
+  useEffect(() => {
+    activeIdRef.current = activeId;
+  }, [activeId]);
+
+
 
   const activeConversation = useMemo(
     () => conversationsState.find((c) => c.id === activeId)!,
@@ -184,6 +238,7 @@ export default function Chat() {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const welcomeMessageShownRef = useRef(false);
   const lastSpokenAssistantRef = useRef<string | null>(null);
@@ -195,39 +250,85 @@ export default function Chat() {
     messages: initialMessagesRef.current,
   });
 
-  // theme refresh when moon sign saved
+  // Load conversations from localStorage on mount
   useEffect(() => {
-    setTheme(getThemeFromLocalStorage());
-  }, [messages.length]);
+    const { conversations, activeId } = loadConversations();
+    if (conversations.length > 0) {
+      setConversations(conversations);
+      const targetId = activeId || conversations[0].id;
+      setActiveId(targetId);
 
-  // sync when active conversation changes
+      // Update chat state for the loaded conversation
+      const conv = conversations.find((c) => c.id === targetId);
+      if (conv) {
+        setMessages(conv.messages || []);
+        setDurations(conv.durations || {});
+        setBirthDetails(conv.birthDetails || EMPTY_BIRTH);
+      }
+    } else {
+      // If no conversations found, update the default one with current date
+      setConversations([
+        {
+          ...STATIC_DEFAULT_CONVERSATION,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    }
+  }, []);
+
+  // 🔁 Whenever messages change, check for Moon Sign in the last assistant message
+  useEffect(() => {
+    if (messages.length === 0) return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage.role === "assistant") {
+      const text = extractPlainText(lastMessage);
+      const detectedSign = detectMoonSign(text);
+
+      if (detectedSign && MOON_COLORS[detectedSign]) {
+        // Update localStorage
+        if (typeof window !== "undefined") {
+          const currentStored = window.localStorage.getItem(MOON_KEY);
+          if (currentStored !== detectedSign) {
+            window.localStorage.setItem(MOON_KEY, detectedSign);
+            // Update theme state immediately
+            const base = MOON_COLORS[detectedSign];
+            setTheme({
+              main: base.main,
+              sidebar: base.sidebar,
+              text: base.sidebar,
+            });
+          }
+        }
+      }
+    }
+  }, [messages]);
+
+  // when active conversation changes, load its state ONCE
   useEffect(() => {
     const conv = conversationsState.find((c) => c.id === activeId);
     if (!conv) return;
-
-    // load messages/durations/birth details only once,
-    // when the user switches chats
     setMessages(conv.messages || []);
     setDurations(conv.durations || {});
     setBirthDetails(conv.birthDetails || EMPTY_BIRTH);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeId]);
 
-
-  // persist conversations
+  // persist conversations when current conv data changes
   useEffect(() => {
+    const currentId = activeIdRef.current;
     setConversations((prev) => {
       const updated = prev.map((c) =>
-        c.id === activeId
+        c.id === currentId
           ? { ...c, messages: messages, durations, birthDetails }
           : c
       );
-      saveConversations(updated, activeId);
+      saveConversations(updated, currentId);
       return updated;
     });
-  }, [messages, durations, birthDetails, activeId]);
+  }, [messages, durations, birthDetails]);
 
-  // show welcome only for first overall chat
+  // one-time welcome message for very first chat
   useEffect(() => {
     if (welcomeMessageShownRef.current) return;
     if (messages.length > 0) return;
@@ -246,7 +347,7 @@ export default function Chat() {
     welcomeMessageShownRef.current = true;
   }, [messages.length, conversationsState, setMessages]);
 
-  // form
+  // form for message box
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { message: "" },
@@ -278,7 +379,7 @@ export default function Chat() {
     lastSpokenAssistantRef.current = null;
   };
 
-  // delete
+  // delete chat
   const handleDeleteConversation = (id: string) => {
     setConversations((prev) => {
       const filtered = prev.filter((c) => c.id !== id);
@@ -302,9 +403,7 @@ export default function Chat() {
         return [newConv];
       }
 
-      if (nextActive !== activeId) {
-        setActiveId(nextActive);
-      }
+      if (nextActive !== activeId) setActiveId(nextActive);
       saveConversations(filtered, nextActive);
       return filtered;
     });
@@ -314,7 +413,7 @@ export default function Chat() {
     setDurations((prev) => ({ ...prev, [key]: duration }));
   };
 
-  // name -> title
+  // Name -> chat title
   useEffect(() => {
     if (!birthDetails.name?.trim()) return;
     setConversations((prev) =>
@@ -337,15 +436,33 @@ export default function Chat() {
       language === "Hindi"
         ? "hi-IN"
         : language === "Gujarati"
-        ? "gu-IN"
-        : "en-IN";
+          ? "gu-IN"
+          : "en-IN";
     utter.onstart = () => setIsSpeaking(true);
     utter.onend = () => setIsSpeaking(false);
     synth.speak(utter);
   };
 
+  // Helper to get a spoken summary (e.g., first sentence)
+  const getSpokenSummary = (text: string): string => {
+    const sentences = text.match(/[^.!?]+[.!?]*/g);
+    if (sentences && sentences.length > 0) {
+      const firstSentence = sentences[0].trim();
+      // Limit length to avoid very long first sentences
+      if (firstSentence.length > 200) {
+        return firstSentence.substring(0, 200) + "...";
+      }
+      return firstSentence;
+    }
+    // Fallback: return first 200 characters if no sentences found
+    return text.substring(0, 200) + (text.length > 200 ? "..." : "");
+  };
+
   useEffect(() => {
     if (!voiceEnabled) return;
+    // Don't speak while the AI is still thinking or streaming
+    if (status === "submitted" || status === "streaming") return;
+
     const lastAssistant = [...messages]
       .slice()
       .reverse()
@@ -353,19 +470,23 @@ export default function Chat() {
     if (!lastAssistant) return;
     const text = extractPlainText(lastAssistant);
     if (!text || text === lastSpokenAssistantRef.current) return;
+
+    const summary = getSpokenSummary(text);
+    if (!summary) return;
+
     lastSpokenAssistantRef.current = text;
-    speakText(text);
-  }, [messages, voiceEnabled]);
+    speakText(summary);
+  }, [messages, voiceEnabled, status]);
 
   const handleVoiceQuestion = (spokenText: string) => {
     const prefix =
       language === "Hindi"
         ? "Please answer in simple Hindi, 3-4 short sentences, as if speaking."
         : language === "Gujarati"
-        ? "Please answer in simple Gujarati, 3-4 short sentences, as if speaking."
-        : language === "Hinglish"
-        ? "Please answer in casual Hinglish (mix of Hindi and English), 3-4 short sentences."
-        : "Please answer in friendly English, 3-4 short sentences, suitable to be spoken out loud.";
+          ? "Please answer in simple Gujarati, 3-4 short sentences, as if speaking."
+          : language === "Hinglish"
+            ? "Please answer in casual Hinglish (mix of Hindi and English), 3-4 short sentences."
+            : "Please answer in friendly English, 3-4 short sentences, suitable to be spoken out loud.";
 
     const text = `[Voice mode] ${prefix}\nUser: "${spokenText}"`;
     sendMessage({ text });
@@ -388,8 +509,8 @@ export default function Chat() {
       language === "Hindi"
         ? "hi-IN"
         : language === "Gujarati"
-        ? "gu-IN"
-        : "en-IN";
+          ? "gu-IN"
+          : "en-IN";
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
@@ -447,20 +568,39 @@ export default function Chat() {
       className="h-screen w-screen flex overflow-hidden"
       style={{ backgroundColor: theme.sidebar, color: theme.text }}
     >
-      {/* FIXED LEFT SIDEBAR (split: top = history, bottom = pandit) */}
+      {/* MOBILE OVERLAY */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 z-20 bg-black/50 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      {/* LEFT SIDEBAR (split: history + pandit) */}
       <aside
-        className="w-80 h-screen flex flex-col border-r border-white/40"
+        className={`fixed inset-y-0 left-0 z-30 w-80 flex flex-col border-r border-white/40 text-white transition-transform duration-300 md:relative md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
         style={{ backgroundColor: theme.sidebar }}
       >
-        {/* Upper: Previous chats (scrollable list) */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Mobile Close Button */}
+        <div className="md:hidden flex justify-end p-2">
+          <button
+            onClick={() => setIsSidebarOpen(false)}
+            className="p-2 text-white/80 hover:text-white"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        {/* Upper: Previous chats (scrollable) */}
+        {/* Upper: Previous chats (scrollable) - Takes exactly 50% height */}
+        <div className="h-1/2 flex flex-col overflow-hidden border-b border-white/20">
           <div className="px-4 pt-4 pb-2">
             <p className="text-sm font-semibold">Previous chats</p>
           </div>
 
           <div className="flex-1 overflow-y-auto px-4 pb-2">
             {conversationsState.length === 0 ? (
-              <p className="text-xs opacity-70">
+              <p className="text-xs" style={{ opacity: 0.7 }}>
                 You don&apos;t have previous chats yet. Start a new chat and it
                 will appear here.
               </p>
@@ -469,18 +609,21 @@ export default function Chat() {
                 {conversationsState.map((conv) => (
                   <div
                     key={conv.id}
-                    className={`rounded-2xl px-3 py-3 text-xs bg-white/10 border ${
-                      conv.id === activeId
-                        ? "border-white/70"
-                        : "border-white/20"
-                    }`}
+                    className={`rounded-2xl px-3 py-3 text-xs bg-white/10 border ${conv.id === activeId
+                      ? "border-white/70"
+                      : "border-white/20"
+                      }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <p className="text-sm font-semibold truncate">
                           {conv.title || "Untitled chat"}
                         </p>
-                        <p className="opacity-70 text-[11px] truncate">
+                        <p
+                          className="text-[11px] truncate"
+                          style={{ opacity: 0.7 }}
+                          suppressHydrationWarning
+                        >
                           {new Date(conv.createdAt).toLocaleString()}
                         </p>
                       </div>
@@ -497,10 +640,11 @@ export default function Chat() {
                         type="button"
                         onClick={() => setActiveId(conv.id)}
                         className="px-3 py-1 rounded-full bg-white text-[11px] font-medium"
+                        style={{ color: theme.sidebar }}
                       >
                         Open chat
                       </button>
-                      <span className="text-[10px] opacity-70">
+                      <span className="text-[10px]" style={{ opacity: 0.7 }}>
                         {conv.messages.length} msg
                       </span>
                     </div>
@@ -509,71 +653,104 @@ export default function Chat() {
               </div>
             )}
 
-            <p className="mt-4 text-[11px] opacity-70">
+            <p className="mt-4 text-[11px]" style={{ opacity: 0.7 }}>
               Chats are stored only in this browser (localStorage).
             </p>
           </div>
         </div>
 
-        {/* Lower: Talking Pandit (fixed area) */}
-        <div className="px-4 pb-4 pt-3 border-t border-white/30">
-          <div className="flex items-center gap-3 rounded-3xl bg-white/15 px-3 py-3 shadow-sm">
-            <div className="relative w-14 h-14 rounded-full overflow-hidden bg-white/80 flex items-center justify-center">
-              <Image
-                src="/pandit-talk.gif"
-                alt="Pandit avatar"
-                fill
-                className={`object-cover ${
-                  isSpeaking ? "" : "opacity-80"
-                } select-none pointer-events-none`}
-              />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-semibold">Talk to Panditji</p>
-              <p className="text-xs opacity-80">
-                {isListening
-                  ? "Listening… ask your question."
-                  : "Tap mic and ask your question."}
-              </p>
-              <p className="text-[11px] mt-1 opacity-90">
-                {voiceEnabled ? "Voice: ON" : "Voice: OFF"}
-              </p>
-            </div>
-            <div className="flex flex-col gap-2">
+        {/* Lower: Talking Pandit */}
+        {/* Lower: Talking Pandit - Takes exactly 50% height */}
+        <div className="h-1/2 flex flex-col items-center justify-center p-4 relative">
+          {/* Centered Pandit GIF */}
+          <div className="relative w-28 h-28 md:w-40 md:h-40 flex items-center justify-center mb-4 md:mb-6">
+            <Image
+              src={
+                isSpeaking
+                  ? "/pandit-talk.gif"
+                  : "/Pandit.png"
+              }
+              alt="Pandit avatar"
+              fill
+              className="object-contain select-none pointer-events-none"
+              unoptimized
+              priority
+              quality={100}
+            />
+          </div>
+
+          {/* Status Text */}
+          <div className="text-center mb-6 space-y-1">
+            <p className="text-lg font-semibold">Talk to Panditji</p>
+            <p className="text-xs opacity-80">
+              {isListening ? "Listening..." : "Tap mic to speak"}
+            </p>
+          </div>
+
+          {/* Controls Row */}
+          <div className="flex items-center gap-6">
+            {/* Mic Toggle */}
+            <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={handleMicClick}
-                className={`flex items-center justify-center rounded-full w-8 h-8 border text-xs ${
-                  isListening ? "bg-white text-orange-600" : "bg-orange-500 text-white"
-                }`}
+                className={`flex items-center justify-center rounded-full w-12 h-12 border transition-all ${isListening ? "bg-white text-black scale-110" : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                style={{
+                  borderColor: isListening ? "transparent" : "rgba(255,255,255,0.3)",
+                }}
               >
-                <Mic className="w-4 h-4" />
+                <Mic className="w-5 h-5" />
               </button>
+              <span className="text-[10px] uppercase tracking-wider opacity-70">
+                {isListening ? "Mic On" : "Mic Off"}
+              </span>
+            </div>
+
+            {/* Voice Toggle */}
+            <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={toggleVoiceEnabled}
-                className={`flex items-center justify-center rounded-full w-8 h-8 border text-xs ${
-                  voiceEnabled ? "bg-white text-orange-600" : "bg-white/60 text-slate-700"
-                }`}
+                className={`flex items-center justify-center rounded-full w-12 h-12 border transition-all ${voiceEnabled ? "bg-white text-black" : "bg-white/10 hover:bg-white/20 text-white"
+                  }`}
+                style={{
+                  borderColor: voiceEnabled ? "transparent" : "rgba(255,255,255,0.3)",
+                }}
               >
-                <Volume2 className="w-4 h-4" />
+                <Volume2 className="w-5 h-5" />
               </button>
+              <span className="text-[10px] uppercase tracking-wider opacity-70">
+                {voiceEnabled ? "Voice On" : "Voice Off"}
+              </span>
             </div>
           </div>
         </div>
       </aside>
 
-      {/* MAIN CHAT AREA (scrollable content only) */}
+      {/* MAIN CHAT AREA */}
       <main
-        className="flex-1 flex flex-col h-screen overflow-hidden"
+        className="flex-1 flex flex-col h-screen overflow-hidden text-black"
         style={{ backgroundColor: theme.main }}
       >
         {/* TOP BAR */}
         <header
-          className="flex items-center justify-between px-6 py-3 border-b"
-          style={{ borderColor: "rgba(255,255,255,0.8)" }}
+          className="flex items-center justify-between px-4 py-2 md:px-6 md:py-3 border-b text-white"
+          style={{
+            borderColor: "rgba(255,255,255,0.4)",
+            backgroundColor: theme.sidebar
+          }}
         >
           <div className="flex items-center gap-3">
+            {/* Mobile Menu Button */}
+            <button
+              type="button"
+              className="md:hidden p-1 -ml-2 text-white/80 hover:text-white"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+
             <Avatar className="size-9 ring-1 ring-white/60 bg-white">
               <AvatarImage src="/logo.png" />
               <AvatarFallback>Z</AvatarFallback>
@@ -582,7 +759,7 @@ export default function Chat() {
               <span className="font-semibold text-sm">
                 ZodiAI – Your AI Panditji
               </span>
-              <span className="text-[11px] opacity-80">
+              <span className="text-[11px] hidden md:inline" style={{ opacity: 0.8 }}>
                 Gentle Vedic insights — not deterministic predictions.
               </span>
             </div>
@@ -591,13 +768,14 @@ export default function Chat() {
           <div className="flex items-center gap-3 text-xs">
             {/* Language dropdown */}
             <div className="flex items-center gap-1">
-              <span className="opacity-80">Language</span>
+              <span className="hidden md:inline" style={{ opacity: 0.8 }}>Language</span>
               <select
                 value={language}
                 onChange={(e) =>
                   setLanguage(e.target.value as typeof language)
                 }
-                className="text-xs rounded-full border px-3 py-1 bg-white/90"
+                className="text-xs rounded-full border px-2 py-1 md:px-3 bg-white/20 border-white/40 text-white"
+                style={{ color: "white" }}
               >
                 <option value="English">English</option>
                 <option value="Hindi">हिंदी</option>
@@ -611,7 +789,8 @@ export default function Chat() {
               type="button"
               size="sm"
               variant="outline"
-              className="text-xs rounded-full bg-white/90"
+              className="text-xs rounded-full bg-white/20 border border-white/40 text-white hover:bg-white/30 hover:text-white hidden md:flex"
+              style={{ color: "white", borderColor: "rgba(255,255,255,0.4)" }}
               onClick={() => {
                 if (typeof window !== "undefined") {
                   navigator.clipboard
@@ -629,11 +808,14 @@ export default function Chat() {
         {/* SCROLLABLE CHAT CONTENT */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Birth details card */}
-          <section className="max-w-3xl w-full mx-auto mb-6 bg-white/95 rounded-3xl shadow-sm border border-white/60 px-6 py-5">
-            <h2 className="text-lg font-semibold mb-1">
+          <section className="max-w-3xl w-full mx-auto mb-6 bg-white/95 rounded-3xl shadow-sm border border-white/60 px-4 py-3 md:px-6 md:py-5">
+            <h2 className="text-base md:text-lg font-semibold mb-1">
               Step 1 · Enter your birth details
             </h2>
-            <p className="text-sm text-slate-600 mb-4">
+            <p
+              className="text-xs md:text-sm mb-3 md:mb-4"
+              style={{ color: theme.sidebar, opacity: 0.9 }}
+            >
               ZodiAI uses your date, time and place of birth to call Vedic
               astrology APIs and interpret your chart. If you don&apos;t know
               the exact time, an approximate hour is ok.
@@ -646,17 +828,19 @@ export default function Chat() {
                 onChange={(e) =>
                   setBirthDetails((b) => ({ ...b, name: e.target.value }))
                 }
-                className="rounded-2xl h-11"
+                className="rounded-2xl h-9 md:h-11 text-xs md:text-sm"
+                style={{ color: "black" }}
               />
 
-              <div className="grid grid-cols-5 gap-3">
+              <div className="grid grid-cols-5 gap-2 md:gap-3">
                 <Input
                   placeholder="DD"
                   value={birthDetails.day}
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, day: e.target.value }))
                   }
-                  className="rounded-2xl h-11"
+                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  style={{ color: "black" }}
                 />
                 <Input
                   placeholder="MM"
@@ -664,7 +848,8 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, month: e.target.value }))
                   }
-                  className="rounded-2xl h-11"
+                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  style={{ color: "black" }}
                 />
                 <Input
                   placeholder="YYYY"
@@ -672,23 +857,26 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, year: e.target.value }))
                   }
-                  className="rounded-2xl h-11"
+                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  style={{ color: "black" }}
                 />
                 <Input
-                  placeholder="Hour (0–23)"
+                  placeholder="Hour"
                   value={birthDetails.hour}
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, hour: e.target.value }))
                   }
-                  className="rounded-2xl h-11"
+                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  style={{ color: "black" }}
                 />
                 <Input
-                  placeholder="Minute"
+                  placeholder="Min"
                   value={birthDetails.minute}
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, minute: e.target.value }))
                   }
-                  className="rounded-2xl h-11"
+                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  style={{ color: "black" }}
                 />
               </div>
 
@@ -698,7 +886,8 @@ export default function Chat() {
                 onChange={(e) =>
                   setBirthDetails((b) => ({ ...b, place: e.target.value }))
                 }
-                className="rounded-2xl h-11"
+                className="rounded-2xl h-9 md:h-11 text-xs md:text-sm"
+                style={{ color: "black" }}
               />
 
               <div className="flex justify-end pt-2">
@@ -717,7 +906,10 @@ export default function Chat() {
               </div>
             </div>
 
-            <p className="mt-3 text-[11px] text-slate-500">
+            <p
+              className="mt-3 text-[11px]"
+              style={{ color: theme.sidebar, opacity: 0.8 }}
+            >
               This information is used only inside this browser session so
               ZodiAI can personalise responses. Do not enter passwords, ID
               numbers or other sensitive data.
@@ -734,15 +926,18 @@ export default function Chat() {
             />
             {status === "submitted" && (
               <div className="flex justify-start max-w-3xl w-full mt-2">
-                <Loader2 className="size-4 animate-spin text-slate-500" />
+                <Loader2
+                  className="size-4 animate-spin"
+                  style={{ color: theme.text, opacity: 0.7 }}
+                />
               </div>
             )}
           </section>
         </div>
 
-        {/* BOTTOM INPUT BAR – background same as main chat */}
+        {/* BOTTOM INPUT BAR – background same as main chat, text darkest tone */}
         <footer
-          className="border-t px-6 py-3"
+          className="border-t px-4 py-2 md:px-6 md:py-3"
           style={{
             borderColor: "rgba(255,255,255,0.8)",
             backgroundColor: theme.main,
@@ -764,8 +959,9 @@ export default function Chat() {
                           id="chat-message"
                           {...field}
                           rows={3}
-                          className="w-full rounded-3xl border bg-white/95 px-4 py-3 pr-14 text-sm resize-none outline-none"
-                          placeholder="Ask ZodiAI a question about your chart. Press Enter to send · Shift+Enter for new line"
+                          className="w-full rounded-3xl border bg-white/95 px-4 py-2 md:py-3 pr-14 text-sm resize-none outline-none h-12 md:h-auto"
+                          style={{ color: "black" }} // black text for better visibility
+                          placeholder="Ask anything"
                           disabled={status === "streaming"}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" && !e.shiftKey) {
@@ -786,15 +982,15 @@ export default function Chat() {
                         )}
                         {(status === "streaming" ||
                           status === "submitted") && (
-                          <Button
-                            className="absolute right-2 bottom-2 rounded-full h-8 w-8"
-                            size="icon"
-                            type="button"
-                            onClick={() => stop()}
-                          >
-                            <Square className="size-4" />
-                          </Button>
-                        )}
+                            <Button
+                              className="absolute right-2 bottom-2 rounded-full h-8 w-8"
+                              size="icon"
+                              type="button"
+                              onClick={() => stop()}
+                            >
+                              <Square className="size-4" />
+                            </Button>
+                          )}
                       </div>
                     </Field>
                   )}
@@ -802,22 +998,19 @@ export default function Chat() {
               </FieldGroup>
             </form>
 
-            <div className="flex items-center justify-between text-[11px] text-slate-700">
-              <button
-                type="button"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full border bg-white/90"
-                onClick={handleNewChat}
-              >
-                <span className="font-medium text-xs">New</span>
-              </button>
+            <div
+              className="flex items-center justify-between text-[11px]"
+              style={{ color: theme.text }}
+            >
+
               <div className="flex items-center gap-2">
-                <span className="opacity-70">
+                <span style={{ opacity: 0.7 }}>
                   © {new Date().getFullYear()} {OWNER_NAME}
                 </span>
                 <Link href="/terms" className="underline">
                   Terms of Use
                 </Link>
-                <span className="opacity-70">· Powered by</span>
+                <span style={{ opacity: 0.7 }}>· Powered by</span>
                 <Link href="https://ringel.ai/" className="underline">
                   Ringel.AI
                 </Link>
@@ -825,6 +1018,7 @@ export default function Chat() {
               <button
                 type="button"
                 className="inline-flex items-center gap-1 px-3 py-1 rounded-full border bg-white/90"
+                style={{ color: theme.sidebar, borderColor: "transparent" }}
                 onClick={handleNewChat}
               >
                 <span className="font-medium text-xs">{CLEAR_CHAT_TEXT}</span>
