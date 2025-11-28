@@ -355,7 +355,19 @@ export default function Chat() {
 
   const onSubmit = (data: z.infer<typeof formSchema>) => {
     const decorated = `[Language: ${language}] ${data.message}`;
-    sendMessage({ text: decorated });
+    console.log("Sending message with chatId:", activeId);
+    sendMessage(
+      { text: decorated },
+      {
+        body: {
+          chatId: activeId,
+          birthDetails: birthDetails,
+        },
+        headers: {
+          'X-Chat-ID': activeId,
+        }
+      }
+    );
     form.reset();
   };
 
@@ -383,9 +395,14 @@ export default function Chat() {
   const handleDeleteConversation = (id: string) => {
     setConversations((prev) => {
       const filtered = prev.filter((c) => c.id !== id);
-      const nextActive =
-        id === activeId ? filtered[0]?.id ?? "none" : activeId;
 
+      // Calculate next active ID
+      let nextActive = activeId;
+      if (id === activeId) {
+        nextActive = filtered[0]?.id ?? "none";
+      }
+
+      // If all chats deleted, reset to initial state
       if (filtered.length === 0) {
         const newConv: Conversation = {
           id: "initial",
@@ -395,16 +412,25 @@ export default function Chat() {
           durations: {},
           birthDetails: EMPTY_BIRTH,
         };
-        saveConversations([newConv], newConv.id);
-        setActiveId(newConv.id);
-        setMessages([]);
-        setDurations({});
-        setBirthDetails(EMPTY_BIRTH);
+
+        // Schedule side effects for after render
+        setTimeout(() => {
+          saveConversations([newConv], newConv.id);
+          setActiveId(newConv.id);
+          setMessages([]);
+          setDurations({});
+          setBirthDetails(EMPTY_BIRTH);
+        }, 0);
+
         return [newConv];
       }
 
-      if (nextActive !== activeId) setActiveId(nextActive);
-      saveConversations(filtered, nextActive);
+      // Schedule side effects for after render
+      setTimeout(() => {
+        if (nextActive !== activeId) setActiveId(nextActive);
+        saveConversations(filtered, nextActive);
+      }, 0);
+
       return filtered;
     });
   };
@@ -504,7 +530,18 @@ export default function Chat() {
             : "Please answer in friendly English, 3-4 short sentences, suitable to be spoken out loud.";
 
     const text = `[Voice mode] ${prefix}\nUser: "${spokenText}"`;
-    sendMessage({ text });
+    sendMessage(
+      { text },
+      {
+        body: {
+          chatId: activeId,
+          birthDetails: birthDetails,
+        },
+        headers: {
+          'X-Chat-ID': activeId,
+        }
+      }
+    );
   };
 
   const recognitionRef = useRef<any>(null);
@@ -581,7 +618,7 @@ export default function Chat() {
 
   return (
     <div
-      className="h-screen w-screen flex overflow-hidden"
+      className="h-screen w-screen flex overflow-hidden transition-colors duration-[1500ms] ease-in-out"
       style={{ backgroundColor: theme.sidebar, color: theme.text }}
     >
       {/* MOBILE OVERLAY */}
@@ -594,7 +631,7 @@ export default function Chat() {
 
       {/* LEFT SIDEBAR (split: history + pandit) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-30 w-80 flex flex-col border-r border-white/40 text-white transition-transform duration-300 md:relative md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 left-0 z-30 w-80 flex flex-col border-r border-white/40 text-white transition-all duration-[1500ms] ease-in-out md:relative md:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         style={{ backgroundColor: theme.sidebar }}
       >
@@ -746,12 +783,12 @@ export default function Chat() {
 
       {/* MAIN CHAT AREA */}
       <main
-        className="flex-1 flex flex-col h-screen overflow-hidden text-black"
+        className="flex-1 flex flex-col h-screen overflow-hidden text-black transition-colors duration-[1500ms] ease-in-out"
         style={{ backgroundColor: theme.main }}
       >
         {/* TOP BAR */}
         <header
-          className="flex items-center justify-between px-4 py-2 md:px-6 md:py-3 border-b text-white"
+          className="flex items-center justify-between px-4 py-2 md:px-6 md:py-3 border-b text-white transition-colors duration-[1500ms] ease-in-out"
           style={{
             borderColor: "rgba(255,255,255,0.4)",
             backgroundColor: theme.sidebar
@@ -953,7 +990,7 @@ export default function Chat() {
 
         {/* BOTTOM INPUT BAR – background same as main chat, text darkest tone */}
         <footer
-          className="border-t px-4 py-2 md:px-6 md:py-3"
+          className="border-t px-4 py-2 md:px-6 md:py-3 transition-colors duration-[1500ms] ease-in-out"
           style={{
             borderColor: "rgba(255,255,255,0.8)",
             backgroundColor: theme.main,
@@ -1015,7 +1052,7 @@ export default function Chat() {
             </form>
 
             <div
-              className="flex items-center justify-between text-[11px]"
+              className="flex items-center justify-between text-[11px] transition-colors duration-[1500ms] ease-in-out"
               style={{ color: theme.text }}
             >
 
@@ -1033,7 +1070,7 @@ export default function Chat() {
               </div>
               <button
                 type="button"
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-full border bg-white/90"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-full border bg-white/90 transition-colors duration-[1500ms] ease-in-out"
                 style={{ color: theme.sidebar, borderColor: "transparent" }}
                 onClick={handleNewChat}
               >

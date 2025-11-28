@@ -1,0 +1,117 @@
+[2025-11-28T13:01:56.476Z] API received: {"chatId":"debug-chat-id","birthDetails":{"name":"Debug User"},"messageCount":1}
+[2025-11-28T13:02:01.219Z] onFinish triggered for chatId: "debug-chat-id"
+[2025-11-28T13:02:01.219Z] Saving user message... 
+[2025-11-28T13:02:01.221Z] Saving assistant response... 
+[2025-11-28T13:02:01.221Z] Save complete. 
+[2025-11-28T13:03:13.020Z] API received: {"chatId":"conv-1764334545884","birthDetails":{"name":"Hitarth Talavia","day":"07","month":"02","year":"2001","hour":"22","minute":"00","place":"Ahmedabad"},"messageCount":3}
+[2025-11-28T13:03:24.107Z] onFinish triggered for chatId: "conv-1764334545884"
+[2025-11-28T13:03:24.107Z] Saving user message... 
+[2025-11-28T13:03:24.112Z] Saving assistant response... 
+[2025-11-28T13:03:24.114Z] Save complete. 
+[2025-11-28T13:03:52.725Z] API received: {"chatId":"conv-1764334545884","birthDetails":{"name":"Hitarth Talavia","day":"07","month":"02","year":"2001","hour":"22","minute":"00","place":"Ahmedabad"},"messageCount":5}
+[2025-11-28T13:03:56.907Z] onFinish triggered for chatId: "conv-1764334545884"
+[2025-11-28T13:03:56.907Z] Saving user message... 
+[2025-11-28T13:03:56.910Z] Saving assistant response... 
+[2025-11-28T13:03:56.911Z] Save complete. 
+[2025-11-28T13:09:23.370Z] API received: {"messageCount":1}
+[2025-11-28T13:09:34.064Z] onFinish triggered for chatId: 
+[2025-11-28T13:09:34.065Z] No chatId provided, skipping save. 
+[2025-11-28T13:09:41.390Z] API received: {"messageCount":3}
+[2025-11-28T13:09:51.908Z] onFinish triggered for chatId: 
+[2025-11-28T13:09:51.908Z] No chatId provided, skipping save. 
+[2025-11-28T13:14:06.202Z] API received: {"messageCount":5}
+[2025-11-28T13:14:15.927Z] onFinish triggered for chatId: 
+[2025-11-28T13:14:15.928Z] No chatId provided, skipping save. 
+[2025-11-28T13:14:25.472Z] API received: {"messageCount":7}
+[2025-11-28T13:14:37.158Z] onFinish triggered for chatId: 
+[2025-11-28T13:14:37.159Z] No chatId provided, skipping save. 
+[2025-11-28T13:19:27.933Z] API received: {"chatId":"chat-alice-1","birthDetails":{"name":"Alice","place":"London","date":"01/01/1990"},"messageCount":1}
+[2025-11-28T13:19:29.934Z] API received: {"chatId":"chat-bob-1","birthDetails":{"name":"Bob","place":"New York","date":"02/02/1995"},"messageCount":1}
+[2025-11-28T13:19:33.777Z] onFinish triggered for chatId: "chat-alice-1"
+[2025-11-28T13:19:33.778Z] Saving user message... 
+[2025-11-28T13:19:33.780Z] Saving assistant response... 
+[2025-11-28T13:19:33.781Z] Save complete. 
+[2025-11-28T13:19:34.793Z] onFinish triggered for chatId: "chat-bob-1"
+[2025-11-28T13:19:34.794Z] Saving user message... 
+[2025-11-28T13:19:34.795Z] Saving assistant response... 
+[2025-11-28T13:19:34.795Z] Save complete. 
+[2025-11-28T13:23:34.760Z] API received: {"messageCount":9}
+[2025-11-28T13:23:45.095Z] onFinish triggered for chatId: 
+[2025-11-28T13:23:45.096Z] No chatId provided, skipping save. 
+[2025-11-28T13:30:21.152Z] API received: {"messageCount":11}
+[2025-11-28T13:30:32.198Z] onFinish triggered for chatId: 
+[2025-11-28T13:30:32.199Z] No chatId provided, skipping save. 
+[2025-11-28T13:45:11.107Z] API received: {"messageCount":13}
+[2025-11-28T13:47:00.098Z] API received: {"chatId":"fix-test","birthDetails":{"name":"Fix User"},"messageCount":1}
+[2025-11-28T13:48:24.969Z] API received: {"chatId":"fix-test-2","birthDetails":{"name":"Fix User 2"},"messageCount":1}
+[2025-11-28T13:49:02.352Z] API received: {"chatId":"fix-test-3","birthDetails":{"name":"Fix User 3"},"messageCount":1}
+[2025-11-28T13:49:03.451Z] API received (processed): {"chatId":"fix-test-3","birthDetails":{"name":"Fix User 3"},"messageCount":1}
+[2025-11-28T13:49:03.452Z] Saving user message immediately... 
+[2025-11-28T13:49:03.455Z] Starting streamText... 
+[2025-11-28T13:49:03.533Z] Chat route failed: {}
+[2025-11-28T13:49:48.917Z] API received: {"chatId":"fix-test-4","birthDetails":{"name":"Fix User 4"},"messageCount":1}
+[2025-11-28T13:49:49.811Z] API received (processed): {"chatId":"fix-test-4","birthDetails":{"name":"Fix User 4"},"messageCount":1}
+[2025-11-28T13:49:49.811Z] Saving user message immediately... 
+[2025-11-28T13:49:49.812Z] Starting streamText... 
+[2025-11-28T13:49:49.868Z] Chat route failed: {}
+[2025-11-28T13:49:49.868Z] Saving fallback response... 
+[2025-11-28T14:07:30.841Z] API received: {"messageCount":15}
+[2025-11-28T14:07:38.571Z] onFinish triggered for chatId: 
+[2025-11-28T14:07:38.571Z] No chatId provided, skipping save. 
+[2025-11-28T14:21:01.942Z] API received: {"messageCount":17}
+[2025-11-28T14:21:11.854Z] onFinish triggered for chatId: 
+[2025-11-28T14:21:11.855Z] No chatId provided, skipping save. 
+[2025-11-28T14:21:49.613Z] API received: {"messageCount":1}
+[2025-11-28T14:22:02.424Z] onFinish triggered for chatId: 
+[2025-11-28T14:22:02.424Z] No chatId provided, skipping save. 
+[2025-11-28T14:23:18.983Z] API received: {"chatId":"test-chat-new-file","birthDetails":{"name":"Test User New"},"messageCount":1}
+[2025-11-28T14:23:23.030Z] onFinish triggered for chatId: "test-chat-new-file"
+[2025-11-28T14:23:23.030Z] Saving user message... 
+[2025-11-28T14:23:23.038Z] Saving assistant response... 
+[2025-11-28T14:23:23.038Z] Save complete. 
+[2025-11-28T14:28:02.242Z] API received: {"chatId":"csv-test-chat","birthDetails":{"name":"CSV User","place":"Delhi","date":"01/01/2000","time":"12:00"},"messageCount":1}
+[2025-11-28T14:28:05.529Z] onFinish triggered for chatId: "csv-test-chat"
+[2025-11-28T14:28:05.530Z] Saving user message... 
+[2025-11-28T14:28:05.537Z] Saving assistant response... 
+[2025-11-28T14:28:05.539Z] Save complete. 
+[2025-11-28T14:30:51.706Z] API received: {"messageCount":3}
+[2025-11-28T14:31:00.428Z] onFinish triggered for chatId: 
+[2025-11-28T14:31:00.429Z] No chatId provided, skipping save. 
+[2025-11-28T14:32:35.406Z] API received: {"messageCount":2}
+[2025-11-28T14:32:46.679Z] onFinish triggered for chatId: 
+[2025-11-28T14:32:46.679Z] No chatId provided, skipping save. 
+[2025-11-28T14:37:22.720Z] API received: {"chatId":"","messageCount":2,"source":"none"}
+[2025-11-28T14:37:32.534Z] onFinish triggered for chatId: 
+[2025-11-28T14:37:32.535Z] No chatId provided, skipping save. 
+[2025-11-28T15:57:17.640Z] API received: {"chatId":"","messageCount":2,"source":"none"}
+[2025-11-28T15:57:29.183Z] onFinish triggered for chatId: 
+[2025-11-28T15:57:29.184Z] No chatId provided, skipping save. 
+[2025-11-28T16:03:44.165Z] API received: {"chatId":"new-csv-test","birthDetails":{"name":"New CSV User","place":"Mumbai","date":"15/08/1947","time":"00:00"},"messageCount":1,"source":"body"}
+[2025-11-28T16:03:48.796Z] onFinish triggered for chatId: "new-csv-test"
+[2025-11-28T16:03:48.797Z] Saving user message... 
+[2025-11-28T16:03:48.799Z] Saving assistant response... 
+[2025-11-28T16:03:48.800Z] Save complete. 
+[2025-11-28T16:06:28.379Z] API received: {"chatId":"","messageCount":2,"source":"none"}
+[2025-11-28T16:06:41.474Z] onFinish triggered for chatId: 
+[2025-11-28T16:06:41.475Z] No chatId provided, skipping save. 
+[2025-11-28T16:13:21.818Z] API received: {"chatId":"","messageCount":1,"source":"none"}
+[2025-11-28T16:13:36.008Z] onFinish triggered for chatId: 
+[2025-11-28T16:13:36.009Z] No chatId provided, skipping save. 
+[2025-11-28T16:14:49.024Z] API received: {"chatId":"initial","birthDetails":{"name":"Hitarth Talavia","day":"07","month":"02","year":"2001","hour":"22","minute":"00","place":"ahmedabad"},"messageCount":3,"source":"body"}
+[2025-11-28T16:15:01.420Z] onFinish triggered for chatId: "initial"
+[2025-11-28T16:15:01.421Z] Saving user message... 
+[2025-11-28T16:15:01.426Z] Saving assistant response... 
+[2025-11-28T16:15:01.427Z] Save complete. 
+[2025-11-28T16:18:00.875Z] API received: {"chatId":"birth-details-test-2","birthDetails":{"name":"BD User 2","place":"Bangalore","day":"10","month":"10","year":"2000","hour":"15","minute":"45"},"messageCount":1,"source":"body"}
+[2025-11-28T16:18:03.968Z] onFinish triggered for chatId: "birth-details-test-2"
+[2025-11-28T16:18:03.969Z] Saving user message... 
+[2025-11-28T16:18:03.972Z] Saving assistant response... 
+[2025-11-28T16:18:03.973Z] Save complete. 
+[2025-11-28T16:18:46.387Z] API received: {"chatId":"","messageCount":2,"source":"none"}
+[2025-11-28T16:18:56.475Z] onFinish triggered for chatId: 
+[2025-11-28T16:18:56.475Z] No chatId provided, skipping save. 
+[2025-11-28T16:19:05.838Z] API received: {"chatId":"initial","birthDetails":{"name":"Hitarth Talavia","day":"07","month":"02","year":"2001","hour":"22","minute":"00","place":"ahmedabad"},"messageCount":4,"source":"body"}
+[2025-11-28T16:19:16.137Z] onFinish triggered for chatId: "initial"
+[2025-11-28T16:19:16.138Z] Saving user message... 
+[2025-11-28T16:19:16.149Z] Saving assistant response... 
+[2025-11-28T16:19:16.151Z] Save complete. 

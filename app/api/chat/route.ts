@@ -53,8 +53,29 @@ const astrologyTool = {
   },
 };
 
+import { saveChatLog } from "@/lib/storage";
+
+import fs from 'fs';
+import path from 'path';
+
+const DEBUG_FILE = path.join(process.cwd(), 'data', 'debug.log');
+
+function logDebug(message: string, data?: any) {
+  try {
+    const timestamp = new Date().toISOString();
+    const logEntry = `[${timestamp}] ${message} ${data ? JSON.stringify(data) : ''}\n`;
+    fs.appendFileSync(DEBUG_FILE, logEntry);
+  } catch (e) {
+    console.error("Failed to write debug log:", e);
+  }
+}
+
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json();
+  const { messages, chatId: bodyChatId, birthDetails }: { messages: UIMessage[], chatId?: string, birthDetails?: any } = await req.json();
+  const headerChatId = req.headers.get('X-Chat-ID');
+  const chatId = bodyChatId || headerChatId || '';
+
+  logDebug("API received:", { chatId, birthDetails, messageCount: messages.length, source: bodyChatId ? 'body' : (headerChatId ? 'header' : 'none') });
 
   // --- moderation on latest user message ---
   const latestUserMessage = messages.filter((msg) => msg.role === "user").pop();
@@ -110,6 +131,40 @@ export async function POST(req: Request) {
           reasoningEffort: "low",
           parallelToolCalls: false,
         },
+      },
+      onFinish: async (event) => {
+        logDebug("onFinish triggered for chatId:", chatId);
+        if (!chatId) {
+          logDebug("No chatId provided, skipping save.");
+          return;
+        }
+
+        // 1. Save the User's message (the last one in the input array)
+        const lastUserMsg = messages[messages.length - 1];
+        if (lastUserMsg && lastUserMsg.role === 'user') {
+          const userText = lastUserMsg.parts
+            .filter(p => p.type === 'text')
+            .map(p => (p as any).text)
+            .join('');
+
+          logDebug("Saving user message...");
+          await saveChatLog(chatId, {
+            role: 'user',
+            content: userText,
+            isGenerated: false,
+            timestamp: new Date().toISOString(),
+          }, birthDetails);
+        }
+
+        // 2. Save the Assistant's response
+        logDebug("Saving assistant response...");
+        await saveChatLog(chatId, {
+          role: 'assistant',
+          content: event.text,
+          isGenerated: true,
+          timestamp: new Date().toISOString(),
+        });
+        logDebug("Save complete.");
       },
     });
 

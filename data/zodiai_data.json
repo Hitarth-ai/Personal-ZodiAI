@@ -1,0 +1,183 @@
+[
+  {
+    "userId": "2d94a38f2e11e5f3b78ac374e1e0031b",
+    "birthDetails": {
+      "name": "Fix User 3"
+    },
+    "chats": [
+      {
+        "id": "fix-test-3",
+        "timestamp": "2025-11-28T13:49:03.454Z",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello fix 3",
+            "isGenerated": false,
+            "timestamp": "2025-11-28T13:49:03.452Z"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "userId": "80e4f549243000be64b3ea513637bc40",
+    "birthDetails": {
+      "name": "Fix User 4"
+    },
+    "chats": [
+      {
+        "id": "fix-test-4",
+        "timestamp": "2025-11-28T13:49:49.812Z",
+        "messages": [
+          {
+            "role": "user",
+            "content": "Hello fix 4",
+            "isGenerated": false,
+            "timestamp": "2025-11-28T13:49:49.811Z"
+          },
+          {
+            "role": "assistant",
+            "content": "Panditji ko abhi astrology service se signal nahi mil raha, lekin main general Vedic astrology ke basis par baat kar sakta hoon. Thoda simple shabdon mein apna sawaal phir se batao, beta.",
+            "isGenerated": true,
+            "timestamp": "2025-11-28T13:49:49.869Z"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "test-chat-new-file",
+    "timestamp": "2025-11-28T14:23:23.036Z",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Testing new storage file",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T14:23:23.031Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello, seeker of the stars! Your message has appeared clearly across the astral planes—I'm ready and listening.\n\nIf you’d like a peek into your cosmic blueprint, just share your birth details (date, time, and place). Or, if you simply want guidance for today, this week, or a life area, tell me what’s on your mind.\n\nRemember:  \nAstrology offers guidance, not fixed destiny. Use this for reflection, and combine it with your own judgment and professional advice if needed.\n\nWhat shall we explore together? 🌒✨",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T14:23:23.038Z"
+      }
+    ],
+    "birthDetails": {
+      "name": "Test User New"
+    }
+  },
+  {
+    "id": "csv-test-chat",
+    "timestamp": "2025-11-28T14:28:05.532Z",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Testing CSV storage",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T14:28:05.530Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello Seeker of the Stars,\n\nYour message was received—no cosmic alignments needed for a simple test! 🌒 If you want to explore your birth chart or get insight into any area of your life, please share your birth details (name, date, time, and place of birth). Otherwise, let me know what you'd like to test or ask next.\n\nRemember:  \nAstrology offers guidance, not fixed destiny. Use this for reflection, and combine it with your own judgment and professional advice if needed.",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T14:28:05.537Z"
+      }
+    ],
+    "birthDetails": {
+      "name": "CSV User",
+      "place": "Delhi",
+      "date": "01/01/2000",
+      "time": "12:00"
+    }
+  },
+  {
+    "id": "new-csv-test",
+    "timestamp": "2025-11-28T16:03:48.798Z",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Testing new CSV format",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T16:03:48.797Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello, mysterious traveler! It looks like you've mentioned \"testing new CSV format.\" If you’d like to see how I handle astrology queries, just share your birth details (name, date, time, and place), and I’ll reveal what the cosmos whispers for you…  \n\nOr, if you have a CSV-related question or want help with data formats, let me know what you need!\n\nAstrology offers guidance, not fixed destiny. Use this for reflection, and combine it with your own judgment and professional advice if needed.",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T16:03:48.799Z"
+      }
+    ],
+    "birthDetails": {
+      "name": "New CSV User",
+      "place": "Mumbai",
+      "date": "15/08/1947",
+      "time": "00:00"
+    }
+  },
+  {
+    "id": "initial",
+    "timestamp": "2025-11-28T16:15:01.422Z",
+    "messages": [
+      {
+        "role": "user",
+        "content": "[Language: English] Tell me about my career",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T16:15:01.421Z"
+      },
+      {
+        "role": "assistant",
+        "content": "**Career Guidance for Hitarth Talavia**  \n(based on your Vedic chart: Virgo Ascendant, Cancer Moon in Pushya Nakshatra, Mercury dominant)\n\n**1. Your Career DNA (Key Patterns):**\n- Analytical & Detail-Oriented: Virgo rising gives you a natural knack for analysis, systems, and perfectionism. You thrive where careful thinking, organization, or troubleshooting is required.\n- Strong Communication: Mercury is your chart ruler—excel in jobs involving research, teaching, data, writing, or communication. You’re skilled at explaining complex things clearly.\n- Sensitive Problem Solver: Moon in Cancer (Pushya) hints at deep empathy; you want your work to help, nurture, or improve life for others. You sense clients’ or colleagues’ moods, making you a natural advisor or support figure.\n- Steadiness with Pressure: Saturn’s influence on your Moon gifts patience for long-term projects. You can manage responsibilities well, but must watch for emotional burnout or worry.\n- Adaptable Learner: Mercury and Virgo energies love learning and adapting—embrace evolving industries rather than rigid paths.\n\n**2. Favorable Career Fields:**\n- Research, analytics, medicine (especially diagnostics, healing, or psychology)\n- Writing, editing, teaching, journalism, public relations\n- IT, software, data science—where organization and logic matter\n- Consulting, advisory roles (HR, management, quality control)\n- Service, counseling, social work, NGO activity\n- Anything combining skill with service or problem-solving\n\n**3. Caution & Guidance:**\n- Beware of overthinking and self-criticism—perfectionism can delay progress!\n- Seek environments where your opinion is valued and you can keep learning.\n- Emotional ups and downs may affect work: have routines to support your mental wellbeing.\n- Align your work with a sense of purpose or service; soulless jobs will drain you quickly.\n\n**4. Success Triggers:**\n- Small teams or independent projects suit you well.\n- Roles where you bridge logic and emotion (e.g., analyst-mentor, tech counselor).\n- Keep updating your skills—Mercury’s energy brings luck through curiosity.\n\nWould you like a glimpse into your “current energies” for work (this week/month), or do you have a specific job/field in mind?  \n—\nAstrology offers guidance, not fixed destiny. Use this for reflection, and combine it with your own judgment and professional advice if needed.",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T16:15:01.426Z"
+      },
+      {
+        "role": "user",
+        "content": "[Language: English] Tell me about my career",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T16:19:16.138Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Certainly, Hitarth. Let’s peer into the subtle energies shaping your path of work and learning…\n\n**Career & Learning Themes for You**\n\n**Your Strengths:**\n- **Analytical mind**: As a Virgo ascendant ruled by Mercury, you shine in fields requiring precision, problem-solving, and attention to detail. You likely excel in research, analysis, writing, technology, or anything systematic.\n- **Communication skills**: A naturally strong communicator—whether through speaking, writing, or even design—your ideas can influence others.\n- **Service & care**: With the Moon in Cancer (Pushya Nakshatra), you possess empathy and an instinct to improve others’ lives. Health, education, consulting, psychology, or even philanthropy can be fulfilling.\n- **Steady growth**: Saturn’s emphasis means your real success often comes gradually, with discipline and perseverance—don’t expect shortcuts, but expect deep mastery.\n\n**Hidden Patterns & Challenges:**\n- **Perfectionism**: Virgo’s meticulous nature may push you to overthink or hesitate before acting. Learn to balance planning with doing.\n- **Emotional tides**: Your Cancer Moon makes you sensitive to workplace moods and energies—choose colleagues, clients, or roles that feel emotionally safe.\n- **Responsibility vs. freedom**: You might sometimes feel heavy with obligation. Remember to make space for learning, exploration, and self-care amidst your duties.\n\n**Favorable Fields (not exhaustive):**\n- Science, technology, health and healing, research, writing, education, finance/accounting, consulting, HR, IT, or social/environmental work.\n- Anything where you can combine logic with compassion, structure with service.\n\n**Career Guidance from the Chart:**\n- Seek roles that let you “fix” or “improve” something, or help others in a practical way.\n- You do best in environments that value ethics, order, and genuine contribution—not just results at any cost.\n- You may notice that real career milestones come in steps; patience, learning, and adaptability are your allies.\n\n**Short Ritual**: Periodically reflect, “Am I growing and helping, or just grinding?” This keeps you aligned with your higher path.\n\nWould you like:\n- Guidance on your current work situation, opportunities this year, or advice about studies or a specific goal?\n\nAstrology is for guidance, not certainties—use your intuition and judgment as well as these cosmic hints!",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T16:19:16.149Z"
+      }
+    ],
+    "birthDetails": {
+      "name": "Hitarth Talavia",
+      "day": "07",
+      "month": "02",
+      "year": "2001",
+      "hour": "22",
+      "minute": "00",
+      "place": "ahmedabad"
+    }
+  },
+  {
+    "id": "birth-details-test-2",
+    "timestamp": "2025-11-28T16:18:03.970Z",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Testing birth details in CSV retry",
+        "isGenerated": false,
+        "timestamp": "2025-11-28T16:18:03.969Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Please provide your birth details in the following format so I can read them correctly:\n\n**Format:**\n- Name\n- Date of Birth (DD-MM-YYYY)\n- Time of Birth (HH:MM, use 24-hour format)\n- Place of Birth (City, State, Country)\n\nExample:\n```\nAmit Sharma, 14-08-1990, 10:35, Mumbai, Maharashtra, India\n```\n\nOnce you provide these details, I’ll unlock the mysteries of your birth chart and guide you through what the stars whisper about your journey. Just reply with your info!",
+        "isGenerated": true,
+        "timestamp": "2025-11-28T16:18:03.972Z"
+      }
+    ],
+    "birthDetails": {
+      "name": "BD User 2",
+      "place": "Bangalore",
+      "day": "10",
+      "month": "10",
+      "year": "2000",
+      "hour": "15",
+      "minute": "45"
+    }
+  }
+]
