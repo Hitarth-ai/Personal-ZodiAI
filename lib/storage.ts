@@ -91,6 +91,9 @@ async function appendToCSV(logEntry: {
     await fs.appendFile(CSV_FILE, csvRow, 'utf-8');
 }
 
+import { appendToGoogleSheet } from './google-sheets';
+import { appendToRedis } from './redis';
+
 export async function saveChatLog(chatId: string, message: ChatLog['messages'][0], birthDetails?: ChatLog['birthDetails']) {
     const logs = await readChatLogs();
     let chatIndex = logs.findIndex(log => log.id === chatId);
@@ -117,18 +120,35 @@ export async function saveChatLog(chatId: string, message: ChatLog['messages'][0
 
     await writeChatLogs(logs);
 
-    // --- Save to CSV (ONLY User Prompts) ---
+    // --- Save to CSV, Google Sheets & Redis (ONLY User Prompts) ---
     if (message.role === 'user') {
         const currentLog = logs[chatIndex];
         const bd = currentLog.birthDetails;
 
-        await appendToCSV({
+        const logData = {
             userName: bd?.name || 'Unknown',
             birthPlace: bd?.place || 'Unknown',
             birthDate: bd ? (bd.date || `${bd.day}/${bd.month}/${bd.year}`) : 'Unknown',
             birthTime: bd ? (bd.time || `${bd.hour}:${bd.minute}`) : 'Unknown',
             prompt: message.content
-        });
+        };
+
+        const formattedRow = {
+            Name: logData.userName,
+            'Date of Birth': logData.birthDate,
+            'Time of Birth': logData.birthTime,
+            'Place of Birth': logData.birthPlace,
+            Prompt: logData.prompt
+        };
+
+        // 1. Local CSV
+        await appendToCSV(logData);
+
+        // 2. Google Sheet
+        await appendToGoogleSheet(formattedRow);
+
+        // 3. Redis
+        await appendToRedis(formattedRow);
     }
 }
 
