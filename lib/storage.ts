@@ -46,8 +46,12 @@ async function readChatLogs(): Promise<ChatLog[]> {
 }
 
 async function writeChatLogs(logs: ChatLog[]) {
-    await ensureDataDir();
-    await fs.writeFile(CHAT_HISTORY_FILE, JSON.stringify(logs, null, 2), 'utf-8');
+    try {
+        await ensureDataDir();
+        await fs.writeFile(CHAT_HISTORY_FILE, JSON.stringify(logs, null, 2), 'utf-8');
+    } catch (error) {
+        console.warn('Failed to write chat logs (likely read-only FS):', error);
+    }
 }
 
 import { stringify } from 'csv-stringify/sync';
@@ -61,94 +65,103 @@ async function appendToCSV(logEntry: {
     birthTime: string;
     prompt: string;
 }) {
-    await ensureDataDir();
+    try {
+        await ensureDataDir();
 
-    const fileExists = await fs.access(CSV_FILE).then(() => true).catch(() => false);
+        const fileExists = await fs.access(CSV_FILE).then(() => true).catch(() => false);
 
-    const columns = [
-        'Name',
-        'Date of Birth',
-        'Time of Birth',
-        'Place of Birth',
-        'Prompt'
-    ];
+        const columns = [
+            'Name',
+            'Date of Birth',
+            'Time of Birth',
+            'Place of Birth',
+            'Prompt'
+        ];
 
-    if (!fileExists) {
-        const header = stringify([columns], { header: false });
-        await fs.writeFile(CSV_FILE, header, 'utf-8');
+        if (!fileExists) {
+            const header = stringify([columns], { header: false });
+            await fs.writeFile(CSV_FILE, header, 'utf-8');
+        }
+
+        // Prepare row based on columns order
+        const row = [
+            logEntry.userName,
+            logEntry.birthDate,
+            logEntry.birthTime,
+            logEntry.birthPlace,
+            logEntry.prompt
+        ];
+
+        const csvRow = stringify([row], { header: false });
+        await fs.appendFile(CSV_FILE, csvRow, 'utf-8');
+    } catch (error) {
+        console.warn('Failed to append to CSV (likely read-only FS):', error);
     }
-
-    // Prepare row based on columns order
-    const row = [
-        logEntry.userName,
-        logEntry.birthDate,
-        logEntry.birthTime,
-        logEntry.birthPlace,
-        logEntry.prompt
-    ];
-
-    const csvRow = stringify([row], { header: false });
-    await fs.appendFile(CSV_FILE, csvRow, 'utf-8');
 }
 
 import { appendToGoogleSheet } from './google-sheets';
 import { appendToRedis } from './redis';
 
 export async function saveChatLog(chatId: string, message: ChatLog['messages'][0], birthDetails?: ChatLog['birthDetails']) {
-    const logs = await readChatLogs();
-    let chatIndex = logs.findIndex(log => log.id === chatId);
+    try {
+        const logs = await readChatLogs();
+        let chatIndex = logs.findIndex(log => log.id === chatId);
 
-    if (chatIndex === -1) {
-        // New chat session
-        const newLog: ChatLog = {
-            id: chatId,
-            timestamp: new Date().toISOString(),
-            messages: [],
-        };
-        logs.push(newLog);
-        chatIndex = logs.length - 1;
-    }
+        if (chatIndex === -1) {
+            // New chat session
+            const newLog: ChatLog = {
+                id: chatId,
+                timestamp: new Date().toISOString(),
+                messages: [],
+            };
+            logs.push(newLog);
+            chatIndex = logs.length - 1;
+        }
 
-    // Update birth details if provided (and not already set, or overwrite?)
-    // Let's overwrite to keep it fresh if user updates it
-    if (birthDetails) {
-        logs[chatIndex].birthDetails = { ...logs[chatIndex].birthDetails, ...birthDetails };
-    }
+        // Update birth details if provided (and not already set, or overwrite?)
+        // Let's overwrite to keep it fresh if user updates it
+        if (birthDetails) {
+            logs[chatIndex].birthDetails = { ...logs[chatIndex].birthDetails, ...birthDetails };
+        }
 
-    // Add message
-    logs[chatIndex].messages.push(message);
+        // Add message
+        logs[chatIndex].messages.push(message);
 
-    await writeChatLogs(logs);
+        await writeChatLogs(logs);
 
-    // --- Save to CSV, Google Sheets & Redis (ONLY User Prompts) ---
-    if (message.role === 'user') {
-        const currentLog = logs[chatIndex];
-        const bd = currentLog.birthDetails;
+        // --- Save to CSV, Google Sheets & Redis (ONLY User Prompts) ---
+        if (message.role === 'user') {
+            const currentLog = logs[chatIndex];
+            const bd = currentLog.birthDetails;
 
-        const logData = {
-            userName: bd?.name || 'Unknown',
-            birthPlace: bd?.place || 'Unknown',
-            birthDate: bd ? (bd.date || `${bd.day}/${bd.month}/${bd.year}`) : 'Unknown',
-            birthTime: bd ? (bd.time || `${bd.hour}:${bd.minute}`) : 'Unknown',
-            prompt: message.content
-        };
+            const logData = {
+                userName: bd?.name || 'Unknown',
+                birthPlace: bd?.place || 'Unknown',
+                birthDate: bd ? (bd.date || `${bd.day}/${bd.month}/${bd.year}`) : 'Unknown',
+                birthTime: bd ? (bd.time || `${bd.hour}:${bd.minute}`) : 'Unknown',
+                prompt: message.content
+            };
 
-        const formattedRow = {
-            Name: logData.userName,
-            'Date of Birth': logData.birthDate,
-            'Time of Birth': logData.birthTime,
-            'Place of Birth': logData.birthPlace,
-            Prompt: logData.prompt
-        };
+            const formattedRow = {
+                Name: logData.userName,
+                'Date of Birth': logData.birthDate,
+                'Time of Birth': logData.birthTime,
+                'Place of Birth': logData.birthPlace,
+                Prompt: logData.prompt
+            };
 
-        // 1. Local CSV
-        await appendToCSV(logData);
+            // 1. Local CSV (Might fail on Vercel, but caught now)
+            await appendToCSV(logData);
 
-        // 2. Google Sheet
-        await appendToGoogleSheet(formattedRow);
+            // 2. Google Sheet
+            await appendToGoogleSheet(formattedRow);
 
-        // 3. Redis
-        await appendToRedis(formattedRow);
+            // 3. Redis
+            await appendToRedis(formattedRow);
+        }
+    } catch (error) {
+        console.error('Critical error in saveChatLog:', error);
+        // We do NOT rethrow, so the chat can continue even if saving fails
     }
 }
 
