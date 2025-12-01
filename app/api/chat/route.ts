@@ -113,6 +113,29 @@ export async function POST(req: Request) {
     }
   }
 
+  // --- Save User Message (Blocking to ensure persistence) ---
+  // We do this BEFORE streaming to guarantee it finishes before the Vercel function potentially terminates.
+  if (chatId) {
+    const lastUserMsg = messages[messages.length - 1];
+    if (lastUserMsg && lastUserMsg.role === 'user') {
+      const userText = lastUserMsg.parts
+        .filter(part => part.type === 'text')
+        .map(part => (part as any).text)
+        .join('');
+
+      // We don't await this if we want speed, but for reliability on Vercel, we MUST await it
+      // or use waitUntil (if available). Since we want to be 100% sure, we await.
+      // The storage functions catch their own errors, so this won't crash the app.
+      logDebug("Saving user message (pre-stream)...");
+      await saveChatLog(chatId, {
+        role: 'user',
+        content: userText,
+        isGenerated: false,
+        timestamp: new Date().toISOString(),
+      }, birthDetails);
+    }
+  }
+
   // --- main chat logic with safe tools + global fallback ---
   try {
     const result = streamText({
@@ -134,29 +157,9 @@ export async function POST(req: Request) {
       },
       onFinish: async (event) => {
         logDebug("onFinish triggered for chatId:", chatId);
-        if (!chatId) {
-          logDebug("No chatId provided, skipping save.");
-          return;
-        }
+        if (!chatId) return;
 
-        // 1. Save the User's message (the last one in the input array)
-        const lastUserMsg = messages[messages.length - 1];
-        if (lastUserMsg && lastUserMsg.role === 'user') {
-          const userText = lastUserMsg.parts
-            .filter(p => p.type === 'text')
-            .map(p => (p as any).text)
-            .join('');
-
-          logDebug("Saving user message...");
-          await saveChatLog(chatId, {
-            role: 'user',
-            content: userText,
-            isGenerated: false,
-            timestamp: new Date().toISOString(),
-          }, birthDetails);
-        }
-
-        // 2. Save the Assistant's response
+        // 2. Save the Assistant's response (only this needs to be in onFinish)
         logDebug("Saving assistant response...");
         await saveChatLog(chatId, {
           role: 'assistant',
