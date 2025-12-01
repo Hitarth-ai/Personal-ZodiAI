@@ -11,6 +11,7 @@ async function getClient() {
             console.warn('Redis credentials missing. Skipping Redis connection.');
             return null;
         }
+
         client = createClient({
             url: REDIS_URL,
         });

@@ -32,8 +32,12 @@ export async function appendToGoogleSheet(row: {
         const sheet = doc.sheetsByIndex[0]; // use the first sheet
 
         // Check if headers exist, if not add them
-        await sheet.loadHeaderRow();
-        if (sheet.headerValues.length === 0) {
+        try {
+            await sheet.loadHeaderRow();
+            if (sheet.headerValues.length === 0) {
+                throw new Error('No headers');
+            }
+        } catch (e) {
             await sheet.setHeaderRow(['Name', 'Date of Birth', 'Time of Birth', 'Place of Birth', 'Prompt']);
         }
 
