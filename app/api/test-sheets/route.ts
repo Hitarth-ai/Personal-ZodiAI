@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,23 +10,47 @@ export async function GET() {
     const GOOGLE_PRIVATE_KEY = process.env.GOOGLE_PRIVATE_KEY;
 
     const status = {
-        sheetId: {
-            present: !!GOOGLE_SHEET_ID,
-            value: GOOGLE_SHEET_ID ? `${GOOGLE_SHEET_ID.substring(0, 5)}...` : null
+        config: {
+            sheetId: !!GOOGLE_SHEET_ID,
+            email: !!GOOGLE_CLIENT_EMAIL,
+            privateKey: !!GOOGLE_PRIVATE_KEY,
         },
-        email: {
-            present: !!GOOGLE_CLIENT_EMAIL,
-            value: GOOGLE_CLIENT_EMAIL
-        },
-        privateKey: {
-            present: !!GOOGLE_PRIVATE_KEY,
-            length: GOOGLE_PRIVATE_KEY ? GOOGLE_PRIVATE_KEY.length : 0,
-            hasBeginMarker: GOOGLE_PRIVATE_KEY ? GOOGLE_PRIVATE_KEY.includes('BEGIN PRIVATE KEY') : false,
-            hasEndMarker: GOOGLE_PRIVATE_KEY ? GOOGLE_PRIVATE_KEY.includes('END PRIVATE KEY') : false,
-            // Check for literal \n characters which might indicate copy-paste error
-            hasLiteralNewlines: GOOGLE_PRIVATE_KEY ? GOOGLE_PRIVATE_KEY.includes('\\n') : false,
-        }
+        connection: 'pending',
+        error: null as any,
     };
 
-    return NextResponse.json(status);
+    if (!GOOGLE_SHEET_ID || !GOOGLE_CLIENT_EMAIL || !GOOGLE_PRIVATE_KEY) {
+        return NextResponse.json({ ...status, message: 'Missing env vars' }, { status: 500 });
+    }
+
+    try {
+        // Robustly handle private key newlines
+        const privateKey = GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n');
+
+        const serviceAccountAuth = new JWT({
+            email: GOOGLE_CLIENT_EMAIL,
+            key: privateKey,
+            scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+        });
+
+        const doc = new GoogleSpreadsheet(GOOGLE_SHEET_ID, serviceAccountAuth);
+        await doc.loadInfo();
+
+        status.connection = 'success';
+
+        return NextResponse.json({
+            ...status,
+            title: doc.title,
+            sheetCount: doc.sheetCount,
+            message: 'Successfully connected to Google Sheets!'
+        });
+
+    } catch (error: any) {
+        return NextResponse.json({
+            ...status,
+            connection: 'failed',
+            error: error.message,
+            details: error.response?.data || error.stack
+        }, { status: 500 });
+    }
 }
