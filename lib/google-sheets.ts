@@ -19,9 +19,12 @@ export async function appendToGoogleSheet(row: {
     }
 
     try {
+        // Robustly handle private key newlines (fixes Vercel env var issues)
+        const privateKey = GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join('\n');
+
         const serviceAccountAuth = new JWT({
             email: GOOGLE_CLIENT_EMAIL,
-            key: GOOGLE_PRIVATE_KEY,
+            key: privateKey,
             scopes: ['https://www.googleapis.com/auth/spreadsheets'],
         });
 
