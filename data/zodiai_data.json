@@ -237,16 +237,28 @@
         "content": "Hello, seeker. 🌒\n\nWelcome to the cosmic crossroads—I'm ZodiAI, your Vedic astrology guide with a hint of mystery. I'm here to help you explore your inner patterns, turning points, and the subtle forces shaping your journey.\n\nIf you're curious about your personality, life themes, or the vibes for today, let me know!  \nTo get the most accurate insights, you can share your birth details:\n- Your first name\n- Birth date (day-month-year)\n- Approximate birth time (as close as possible)\n- Place of birth (city, country)\n\nOr, just tell me what you’re hoping to discover, and we’ll begin.  \nWhat would you like to explore? 🌑✨\n\n_Reminder: Astrology offers guidance, not fixed destiny. Reflect, but also trust your own wisdom._",
         "isGenerated": true,
         "timestamp": "2025-12-01T09:17:43.241Z"
+      },
+      {
+        "role": "user",
+        "content": "[Language: English] Hello",
+        "isGenerated": false,
+        "timestamp": "2025-12-01T13:13:10.320Z"
+      },
+      {
+        "role": "assistant",
+        "content": "Greetings, Hitarth! The stars shimmer with their quiet messages, and I am here to help you unravel their meaning.\n\nSince I’ve already glimpsed the core energies in your chart, you can now:\n- Choose an area to dive deeper (e.g., “personality”, “career”, “relationships”, “today’s mood”)\n- Or, ask a specific question—something on your mind, a decision, or a situation\n\nWhat would you like ZodiAI to illuminate for you next?\n\nRemember: Astrology offers guidance, not guarantees. Let’s use it to reflect, discover, and empower your path.",
+        "isGenerated": true,
+        "timestamp": "2025-12-01T13:13:18.084Z"
       }
     ],
     "birthDetails": {
-      "name": "",
-      "day": "",
-      "month": "",
-      "year": "",
-      "hour": "",
-      "minute": "",
-      "place": ""
+      "name": "Hitarth Talavia",
+      "day": "07",
+      "month": "02",
+      "year": "2001",
+      "hour": "22",
+      "minute": "00",
+      "place": "Ahmedabad"
     }
   },
   {

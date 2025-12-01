@@ -861,38 +861,49 @@ export default function Chat() {
         {/* SCROLLABLE CHAT CONTENT */}
         <div className="flex-1 overflow-y-auto px-6 py-5">
           {/* Birth details card */}
-          <section className="max-w-3xl w-full mx-auto mb-6 bg-white/95 rounded-3xl shadow-sm border border-white/60 px-4 py-3 md:px-6 md:py-5">
-            <h2 className="text-base md:text-lg font-semibold mb-1">
+          <section className="max-w-3xl w-full mx-auto mb-4 bg-white/95 rounded-3xl shadow-sm border border-white/60 px-3 py-2 md:px-4 md:py-3">
+            <h2 className="text-sm md:text-base font-semibold mb-1">
               Step 1 · Enter your birth details
             </h2>
             <p
-              className="text-xs md:text-sm mb-3 md:mb-4"
+              className="text-[10px] md:text-xs mb-2 md:mb-3"
               style={{ color: theme.sidebar, opacity: 0.9 }}
             >
-              ZodiAI uses your date, time and place of birth to call Vedic
-              astrology APIs and interpret your chart. If you don&apos;t know
-              the exact time, an approximate hour is ok.
+              ZodiAI reads your birth chart from your Birth date, place and time, even an approximate time works.
             </p>
 
-            <div className="space-y-3">
-              <Input
-                placeholder="Name"
-                value={birthDetails.name}
-                onChange={(e) =>
-                  setBirthDetails((b) => ({ ...b, name: e.target.value }))
-                }
-                className="rounded-2xl h-9 md:h-11 text-xs md:text-sm"
-                style={{ color: "black" }}
-              />
+            <div className="space-y-2">
+              {/* Row 1: Name & Place */}
+              <div className="grid grid-cols-2 gap-2">
+                <Input
+                  placeholder="Name"
+                  value={birthDetails.name}
+                  onChange={(e) =>
+                    setBirthDetails((b) => ({ ...b, name: e.target.value }))
+                  }
+                  className="rounded-xl h-8 md:h-9 text-xs"
+                  style={{ color: "black" }}
+                />
+                <Input
+                  placeholder="Birth City"
+                  value={birthDetails.place}
+                  onChange={(e) =>
+                    setBirthDetails((b) => ({ ...b, place: e.target.value }))
+                  }
+                  className="rounded-xl h-8 md:h-9 text-xs"
+                  style={{ color: "black" }}
+                />
+              </div>
 
-              <div className="grid grid-cols-5 gap-2 md:gap-3">
+              {/* Row 2: Date & Time */}
+              <div className="grid grid-cols-5 gap-2">
                 <Input
                   placeholder="DD"
                   value={birthDetails.day}
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, day: e.target.value }))
                   }
-                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  className="rounded-xl h-8 md:h-9 text-xs px-2"
                   style={{ color: "black" }}
                 />
                 <Input
@@ -901,7 +912,7 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, month: e.target.value }))
                   }
-                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  className="rounded-xl h-8 md:h-9 text-xs px-2"
                   style={{ color: "black" }}
                 />
                 <Input
@@ -910,7 +921,7 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, year: e.target.value }))
                   }
-                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  className="rounded-xl h-8 md:h-9 text-xs px-2"
                   style={{ color: "black" }}
                 />
                 <Input
@@ -919,7 +930,7 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, hour: e.target.value }))
                   }
-                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  className="rounded-xl h-8 md:h-9 text-xs px-2"
                   style={{ color: "black" }}
                 />
                 <Input
@@ -928,25 +939,22 @@ export default function Chat() {
                   onChange={(e) =>
                     setBirthDetails((b) => ({ ...b, minute: e.target.value }))
                   }
-                  className="rounded-2xl h-9 md:h-11 text-xs md:text-sm px-2 md:px-3"
+                  className="rounded-xl h-8 md:h-9 text-xs px-2"
                   style={{ color: "black" }}
                 />
               </div>
 
-              <Input
-                placeholder="Place of birth (City, Country)"
-                value={birthDetails.place}
-                onChange={(e) =>
-                  setBirthDetails((b) => ({ ...b, place: e.target.value }))
-                }
-                className="rounded-2xl h-9 md:h-11 text-xs md:text-sm"
-                style={{ color: "black" }}
-              />
+              <div className="flex items-center justify-between mt-2 gap-2">
+                <p
+                  className="text-[10px] leading-tight"
+                  style={{ color: theme.sidebar, opacity: 0.8, maxWidth: '60%' }}
+                >
+                  This only personalises replies and stays in your local cache, never shared.
+                </p>
 
-              <div className="flex justify-end pt-2">
                 <Button
                   type="button"
-                  className="rounded-full bg-slate-900 text-white px-5"
+                  className="rounded-full bg-slate-900 text-white px-4 h-8 text-xs shrink-0"
                   onClick={() => {
                     const summary = `My name is ${birthDetails.name}. My date of birth is ${birthDetails.day}-${birthDetails.month}-${birthDetails.year} at ${birthDetails.hour}:${birthDetails.minute}. I was born in ${birthDetails.place}. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with.`;
                     const decorated = `[Language: ${language}] ${summary}`;
@@ -958,19 +966,10 @@ export default function Chat() {
                 </Button>
               </div>
             </div>
-
-            <p
-              className="mt-3 text-[11px]"
-              style={{ color: theme.sidebar, opacity: 0.8 }}
-            >
-              This information is used only inside this browser session so
-              ZodiAI can personalise responses. Do not enter passwords, ID
-              numbers or other sensitive data.
-            </p>
           </section>
 
           {/* Message wall */}
-          <section className="flex flex-col items-center justify-end min-h-[40vh]">
+          <section className="flex flex-col items-center">
             <MessageWall
               messages={messages}
               status={status}
@@ -1052,11 +1051,11 @@ export default function Chat() {
             </form>
 
             <div
-              className="flex items-center justify-between text-[11px] transition-colors duration-[1500ms] ease-in-out"
+              className="flex items-center justify-between text-[9px] md:text-[11px] transition-colors duration-[1500ms] ease-in-out"
               style={{ color: theme.text }}
             >
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 md:gap-2">
                 <span style={{ opacity: 0.7 }}>
                   © {new Date().getFullYear()} {OWNER_NAME}
                 </span>
