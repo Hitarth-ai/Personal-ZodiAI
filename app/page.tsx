@@ -618,7 +618,7 @@ export default function Chat() {
 
   return (
     <div
-      className="h-screen w-screen flex overflow-hidden transition-colors duration-[1500ms] ease-in-out"
+      className="h-[100dvh] w-screen flex overflow-hidden transition-colors duration-[1500ms] ease-in-out"
       style={{ backgroundColor: theme.sidebar, color: theme.text }}
     >
       {/* MOBILE OVERLAY */}
@@ -783,7 +783,7 @@ export default function Chat() {
 
       {/* MAIN CHAT AREA */}
       <main
-        className="flex-1 flex flex-col h-screen overflow-hidden text-black transition-colors duration-[1500ms] ease-in-out"
+        className="flex-1 flex flex-col overflow-hidden text-black transition-colors duration-[1500ms] ease-in-out"
         style={{ backgroundColor: theme.main }}
       >
         {/* TOP BAR */}
@@ -859,7 +859,7 @@ export default function Chat() {
         </header>
 
         {/* SCROLLABLE CHAT CONTENT */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
+        <div id="chat-scroll-container" className="flex-1 overflow-y-auto px-6 py-5">
           {/* Birth details card */}
           <section className="max-w-3xl w-full mx-auto mb-4 bg-white/95 rounded-3xl shadow-sm border border-white/60 px-3 py-2 md:px-4 md:py-3">
             <h2 className="text-sm md:text-base font-semibold mb-1">
@@ -989,7 +989,7 @@ export default function Chat() {
 
         {/* BOTTOM INPUT BAR – background same as main chat, text darkest tone */}
         <footer
-          className="border-t px-4 py-2 md:px-6 md:py-3 transition-colors duration-[1500ms] ease-in-out"
+          className="border-t px-4 py-2 md:px-6 md:py-3 transition-colors duration-[1500ms] ease-in-out shrink-0"
           style={{
             borderColor: "rgba(255,255,255,0.8)",
             backgroundColor: theme.main,

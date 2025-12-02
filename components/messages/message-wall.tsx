@@ -59,6 +59,31 @@ export function MessageWall({
     });
   }, [messages, isAtBottom]);
 
+  // Mobile-specific: Auto-scroll ONCE when response starts
+  useEffect(() => {
+    if (status !== "submitted" && status !== "streaming") return;
+    if (typeof window === "undefined") return;
+
+    // Check if mobile (md breakpoint is usually 768px)
+    if (window.innerWidth >= 768) return;
+
+    const container = document.getElementById(SCROLL_CONTAINER_ID);
+    if (!container) return;
+
+    // Force scroll to bottom to "attach" the auto-scroll behavior
+    // This sets isAtBottom to true (via the scroll listener), which enables the main auto-scroll effect
+    setTimeout(() => {
+      messagesEndRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "end",
+      });
+    }, 100);
+
+    // We only want this to happen when the status *changes* to submitted/streaming, 
+    // effectively the "start" of the response. 
+    // The dependency array [status] ensures this runs when status updates.
+  }, [status]);
+
   return (
     <div className="relative max-w-3xl w-full">
       <div className="relative flex flex-col gap-4">
