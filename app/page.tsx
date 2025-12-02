@@ -1057,15 +1057,12 @@ export default function Chat() {
 
               <div className="flex items-center gap-1 md:gap-2">
                 <span style={{ opacity: 0.7 }}>
-                  © {new Date().getFullYear()} {OWNER_NAME}
+                  © Hitarth Talavia & Yatharth Shah
                 </span>
                 <Link href="/terms" className="underline">
                   Terms of Use
                 </Link>
-                <span style={{ opacity: 0.7 }}>· Powered by</span>
-                <Link href="https://ringel.ai/" className="underline">
-                  Ringel.AI
-                </Link>
+
               </div>
               <button
                 type="button"
