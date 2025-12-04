@@ -13,8 +13,9 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { MessageWall } from "@/components/messages/message-wall";
+import { RightSidebar } from "@/components/right-sidebar";
 
-import { ArrowUp, Loader2, Mic, Square, Trash2, Volume2, Menu, X } from "lucide-react";
+import { ArrowUp, Loader2, Mic, Square, Trash2, Volume2, Menu, X, BookOpen } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -66,18 +67,18 @@ const EMPTY_BIRTH: BirthDetails = {
 
 // main = lighter chat bg, sidebar = darker shade (also text colour)
 const MOON_COLORS: Record<string, { main: string; sidebar: string }> = {
-  Aries: { main: "#9a5f5aff", sidebar: "#461b17ff" },
-  Taurus: { main: "#A3A78B", sidebar: "#3c4026ff" },
+  Aries: { main: "#bea7a4ff", sidebar: "#461b17ff" },
+  Taurus: { main: "#A3A78B", sidebar: "#343914ff" },
   Gemini: { main: "#f9ebc9ff", sidebar: "#735522ff" },
   Cancer: { main: "#b3d3dbff", sidebar: "#1e4f5aff" },
   Leo: { main: "#ddc69dff", sidebar: "#7e570eff" },
-  Virgo: { main: "#d5ab96ff", sidebar: "#744a35ff" },
-  Libra: { main: "#d6bdbdff", sidebar: "#502525ff" },
-  Scorpio: { main: "#ad9ca5ff", sidebar: "#301d26ff" },
-  Sagittarius: { main: "#e7ddb2ff", sidebar: "#4d431bff" },
-  Capricorn: { main: "#D5E4DD", sidebar: "#AAB6B1" },
-  Aquarius: { main: "#a1cde6ff", sidebar: "#366885ff" },
-  Pisces: { main: "#D8A7A1", sidebar: "#AD8681" },
+  Virgo: { main: "#d5ab96ff", sidebar: "#5e321dff" },
+  Libra: { main: "#d6bdbdff", sidebar: "#541e1eff" },
+  Scorpio: { main: "#ad9ca5ff", sidebar: "#341724ff" },
+  Sagittarius: { main: "#e7ddb2ff", sidebar: "#443b17ff" },
+  Capricorn: { main: "#D5E4DD", sidebar: "#0f5b3bff" },
+  Aquarius: { main: "#a1cde6ff", sidebar: "#1b4964ff" },
+  Pisces: { main: "#D8A7A1", sidebar: "#79261bff" },
 };
 
 const DEFAULT_THEME: Theme = {
@@ -239,6 +240,7 @@ export default function Chat() {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(false);
 
   const welcomeMessageShownRef = useRef(false);
   const lastSpokenAssistantRef = useRef<string | null>(null);
@@ -821,7 +823,6 @@ export default function Chat() {
           <div className="flex items-center gap-3 text-xs">
             {/* Language dropdown */}
             <div className="flex items-center gap-1">
-              <span className="hidden md:inline" style={{ opacity: 0.8 }}>Language</span>
               <select
                 value={language}
                 onChange={(e) =>
@@ -837,24 +838,19 @@ export default function Chat() {
               </select>
             </div>
 
-            {/* Share chat button */}
-            <Button
-              type="button"
-              size="sm"
-              variant="outline"
-              className="text-xs rounded-full bg-white/20 border border-white/40 text-white hover:bg-white/30 hover:text-white hidden md:flex"
-              style={{ color: "white", borderColor: "rgba(255,255,255,0.4)" }}
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  navigator.clipboard
-                    .writeText(window.location.href)
-                    .then(() => toast.success("Chat link copied!"))
-                    .catch(() => toast.error("Could not copy link."));
-                }
-              }}
-            >
-              Share chat
-            </Button>
+
+            {/* Right Sidebar Toggle */}
+            <div className="flex flex-col items-center">
+              <button
+                type="button"
+                onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+                className="p-2 text-white/80 hover:text-white transition-colors"
+                title="Capabilities"
+              >
+                <BookOpen className="w-5 h-5" />
+              </button>
+              <span className="text-[10px] text-white/80 -mt-1">Help</span>
+            </div>
           </div>
         </header>
 
@@ -958,7 +954,18 @@ export default function Chat() {
                   onClick={() => {
                     const summary = `My name is ${birthDetails.name}. My date of birth is ${birthDetails.day}-${birthDetails.month}-${birthDetails.year} at ${birthDetails.hour}:${birthDetails.minute}. I was born in ${birthDetails.place}. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with.`;
                     const decorated = `[Language: ${language}] ${summary}`;
-                    sendMessage({ text: decorated });
+                    sendMessage(
+                      { text: decorated },
+                      {
+                        body: {
+                          chatId: activeId,
+                          birthDetails: birthDetails,
+                        },
+                        headers: {
+                          'X-Chat-ID': activeId,
+                        }
+                      }
+                    );
                   }}
                   disabled={!birthDetails.name || !birthDetails.day}
                 >
@@ -971,7 +978,9 @@ export default function Chat() {
           {/* Message wall */}
           <section className="flex flex-col items-center">
             <MessageWall
-              messages={messages}
+              messages={messages.filter((msg, index, self) =>
+                index === self.findIndex((m) => m.id === msg.id)
+              )}
               status={status}
               durations={durations}
               onDurationChange={handleDurationChange}
@@ -1076,6 +1085,33 @@ export default function Chat() {
           </div>
         </footer>
       </main>
+
+      {/* RIGHT SIDEBAR */}
+      <RightSidebar
+        isOpen={isRightSidebarOpen}
+        onClose={() => setIsRightSidebarOpen(false)}
+        onCapabilityClick={(capability) => {
+          // Close sidebar on mobile (optional, but good UX)
+          if (window.innerWidth < 768) {
+            setIsRightSidebarOpen(false);
+          }
+
+          const decorated = `[Language: ${language}] Tell me about ${capability}`;
+          sendMessage(
+            { text: decorated },
+            {
+              body: {
+                chatId: activeId,
+                birthDetails: birthDetails,
+              },
+              headers: {
+                'X-Chat-ID': activeId,
+              }
+            }
+          );
+        }}
+        theme={theme}
+      />
     </div>
   );
 }

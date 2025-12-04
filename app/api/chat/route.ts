@@ -127,12 +127,17 @@ export async function POST(req: Request) {
       // or use waitUntil (if available). Since we want to be 100% sure, we await.
       // The storage functions catch their own errors, so this won't crash the app.
       logDebug("Saving user message (pre-stream)...");
-      await saveChatLog(chatId, {
+
+      // TIMEOUT WRAPPER: If saving takes > 1s, proceed anyway so user isn't stuck.
+      const savePromise = saveChatLog(chatId, {
         role: 'user',
         content: userText,
         isGenerated: false,
         timestamp: new Date().toISOString(),
       }, birthDetails);
+
+      const timeoutPromise = new Promise(resolve => setTimeout(resolve, 1000));
+      await Promise.race([savePromise, timeoutPromise]);
     }
   }
 
