@@ -4,6 +4,7 @@ import { UIMessage } from "ai";
 import { useEffect, useRef, useState } from "react";
 import { UserMessage } from "./user-message";
 import { AssistantMessage } from "./assistant-message";
+import Image from "next/image";
 
 // Must match the id on the scrollable div in page.tsx
 const SCROLL_CONTAINER_ID = "chat-scroll-container";
@@ -46,6 +47,8 @@ export function MessageWall({
 
   // Auto-scroll only when user is already at the bottom
   useEffect(() => {
+    if (messages.length === 0) return; // Don't scroll if no messages (new chat)
+    if (status === "streaming" || status === "submitted") return; // Disable auto-scroll during streaming/submission
     if (!isAtBottom) return;
     if (typeof window === "undefined") return;
 
@@ -57,32 +60,24 @@ export function MessageWall({
       behavior: "smooth",
       block: "end",
     });
-  }, [messages, isAtBottom]);
+  }, [messages, isAtBottom, status]);
 
-  // Mobile-specific: Auto-scroll ONCE when response starts
+  // Scroll prompt to top when response starts
   useEffect(() => {
-    if (status !== "submitted" && status !== "streaming") return;
-    if (typeof window === "undefined") return;
-
-    // Check if mobile (md breakpoint is usually 768px)
-    if (window.innerWidth >= 768) return;
-
-    const container = document.getElementById(SCROLL_CONTAINER_ID);
-    if (!container) return;
-
-    // Force scroll to bottom to "attach" the auto-scroll behavior
-    // This sets isAtBottom to true (via the scroll listener), which enables the main auto-scroll effect
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "end",
-      });
-    }, 100);
-
-    // We only want this to happen when the status *changes* to submitted/streaming, 
-    // effectively the "start" of the response. 
-    // The dependency array [status] ensures this runs when status updates.
+    if (status === "submitted" || status === "streaming") {
+      // Find the last user message
+      const lastUserMsg = [...messages].reverse().find((m) => m.role === "user");
+      if (lastUserMsg) {
+        const el = document.getElementById(lastUserMsg.id);
+        if (el) {
+          el.scrollIntoView({ block: "start", behavior: "smooth" });
+        }
+      }
+    }
+    // Only run when status changes to submitted/streaming
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status]);
+
 
   return (
     <div className="relative max-w-3xl w-full">
@@ -90,7 +85,7 @@ export function MessageWall({
         {messages.map((message, idx) => {
           const isLastMessage = idx === messages.length - 1;
           return (
-            <div key={message.id} className="w-full">
+            <div key={message.id} id={message.id} className="w-full">
               {message.role === "user" ? (
                 <UserMessage message={message} />
               ) : (
@@ -105,6 +100,23 @@ export function MessageWall({
             </div>
           );
         })}
+        {status === "submitted" && (
+          <div className="flex justify-start w-full pl-4 py-2">
+            <Image
+              src="/loading.gif"
+              alt="Loading..."
+              width={40}
+              height={40}
+              className="object-contain"
+              unoptimized
+            />
+          </div>
+        )}
+        <div
+          className={`transition-all duration-500 ease-in-out ${status === "submitted" || status === "streaming" ? "h-[85vh]" : "h-[50vh]"
+            }`}
+          aria-hidden="true"
+        />
         <div ref={messagesEndRef} />
       </div>
     </div>

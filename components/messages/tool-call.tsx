@@ -1,6 +1,7 @@
 import { ToolCallPart, ToolResultPart } from "ai";
 import { Book, Globe, Search, Presentation, Wrench } from "lucide-react";
 import { Shimmer } from "../ai-elements/shimmer";
+import Image from "next/image";
 
 export interface ToolDisplay {
     call_label: string;
@@ -32,7 +33,12 @@ const TOOL_DISPLAY_MAP: Record<string, ToolDisplay> = {
     },
 };
 
-const DEFAULT_TOOL_DISPLAY: ToolDisplay = { call_label: "Using tool", call_icon: <Wrench className="w-4 h-4" />, result_label: "Used tool", result_icon: <Wrench className="w-4 h-4" /> };
+const DEFAULT_TOOL_DISPLAY: ToolDisplay = {
+    call_label: "Using tool",
+    call_icon: <Image src="/loading.gif" alt="Loading" width={16} height={16} className="w-4 h-4 object-contain" unoptimized />,
+    result_label: "Used tool",
+    result_icon: <Wrench className="w-4 h-4" />
+};
 
 function extractToolName(part: ToolCallPart | ToolResultPart): string | undefined {
     const partWithType = part as unknown as { type?: string; toolName?: string };

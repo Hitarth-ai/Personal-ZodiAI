@@ -985,14 +985,6 @@ export default function Chat() {
               durations={durations}
               onDurationChange={handleDurationChange}
             />
-            {status === "submitted" && (
-              <div className="flex justify-start max-w-3xl w-full mt-2">
-                <Loader2
-                  className="size-4 animate-spin"
-                  style={{ color: theme.text, opacity: 0.7 }}
-                />
-              </div>
-            )}
           </section>
         </div>
 
