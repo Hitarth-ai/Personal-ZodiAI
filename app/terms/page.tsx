@@ -121,12 +121,10 @@ export default function Terms() {
                     <h3 className="text-xl font-semibold">Data Privacy and Security</h3>
                     <ol className="list-decimal list-inside space-y-3">
                         <li className="text-gray-700">
-                            <span className="font-semibold">No Privacy Guarantee:</span> The
-                            AI Chatbot does not guarantee privacy, confidentiality, or
-                            security of the information you provide. Conversations may be
-                            reviewed by {OWNER_NAME}, collaborators, partners, or affiliated
-                            entities for purposes such as improving the AI Chatbot, developing
-                            course materials, and conducting research.
+                            <span className="font-semibold">No Owner Access:</span> The information you provide is not stored anywhere, and Hitarth or Yatharth cannot review your conversations.
+                        </li>
+                        <li className="text-gray-700">
+                            <span className="font-semibold">Possible Third-Party Review:</span> Collaborators, partners, or affiliated entities may review interactions solely for improving the AI chatbot, developing course materials, or conducting research.
                         </li>
                         <li className="text-gray-700">
                             <span className="font-semibold">Public Information:</span> Any

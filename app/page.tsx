@@ -709,7 +709,7 @@ export default function Chat() {
             )}
 
             <p className="mt-4 text-[11px]" style={{ opacity: 0.7 }}>
-              Chats are stored only in this browser (localStorage).
+              Saved only in your browser (cache), never shared.
             </p>
           </div>
         </div>
