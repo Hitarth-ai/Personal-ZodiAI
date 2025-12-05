@@ -146,7 +146,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: MODEL,
       system: SYSTEM_PROMPT,
-      messages: convertToModelMessages(messages),
+      messages: convertToModelMessages(messages.slice(-20)),
       tools: {
         webSearch,
         vectorDatabaseSearch,

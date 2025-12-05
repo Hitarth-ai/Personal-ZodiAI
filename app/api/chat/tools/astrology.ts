@@ -37,24 +37,32 @@ async function callAstrologyApi<TResponse>(
   endpoint: string,
   body: Record<string, unknown>
 ): Promise<TResponse> {
-  const response = await fetch(`${ASTROLOGY_BASE_URL}/${endpoint}`, {
-    method: "POST",
-    headers: {
-      Authorization: getAstrologyAuthHeader(),
-      "Content-Type": "application/json",
-      "Accept-Language": "en",
-    },
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(
-      `AstrologyAPI error (${endpoint}): ${response.status} ${response.statusText} ${text}`
-    );
+  try {
+    const response = await fetch(`${ASTROLOGY_BASE_URL}/${endpoint}`, {
+      method: "POST",
+      headers: {
+        Authorization: getAstrologyAuthHeader(),
+        "Content-Type": "application/json",
+        "Accept-Language": "en",
+      },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => "");
+      throw new Error(
+        `AstrologyAPI error (${endpoint}): ${response.status} ${response.statusText} ${text}`
+      );
+    }
+
+    return (await response.json()) as TResponse;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  return (await response.json()) as TResponse;
 }
 
 type LocationInfo = {
