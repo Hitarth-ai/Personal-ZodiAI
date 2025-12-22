@@ -220,6 +220,39 @@ export const astrologyTool = tool({
   // Cast the whole tool definition to `any` to avoid the TypeScript overload error.
 } as any);
 
+// Helper to prevent massive JSON context
+function truncateLargeData(obj: any, depth = 0): any {
+  if (depth > 3) return "[Truncated Depth]";
+  if (!obj) return obj;
+
+  if (Array.isArray(obj)) {
+    if (obj.length > 20) {
+      return [
+        ...obj.slice(0, 20).map((item) => truncateLargeData(item, depth + 1)),
+        `... ${obj.length - 20} more items ...`,
+      ];
+    }
+    return obj.map((item) => truncateLargeData(item, depth + 1));
+  }
+
+  if (typeof obj === "object") {
+    const newObj: any = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const val = obj[key];
+        if (typeof val === "string" && val.length > 500) {
+          newObj[key] = val.substring(0, 500) + "... [Truncated]";
+        } else {
+          newObj[key] = truncateLargeData(val, depth + 1);
+        }
+      }
+    }
+    return newObj;
+  }
+
+  return obj;
+}
+
 // We export execute separately so TypeScript is happy and runtime works.
 (astrologyTool as any).execute = async (
   input: any
@@ -266,7 +299,7 @@ export const astrologyTool = tool({
         tzone,
         lat,
         lon,
-        rawAstroDetails: astroDetails,
+        rawAstroDetails: truncateLargeData(astroDetails),
       };
     } catch (err) {
       console.error("AstrologyAPI astro_details failed:", err);
@@ -293,7 +326,7 @@ export const astrologyTool = tool({
       tzone,
       lat,
       lon,
-      rawPrediction: prediction,
+      rawPrediction: truncateLargeData(prediction),
     };
   } catch (err) {
     console.error("AstrologyAPI birth_details failed:", err);

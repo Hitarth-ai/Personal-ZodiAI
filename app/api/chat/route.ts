@@ -16,7 +16,7 @@ import { astrologyTool as rawAstrologyTool } from "./tools/astrology";
 
 // Ensure Node.js runtime so Buffer works in astrology tool
 export const runtime = "nodejs";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 /**
  * Safe wrapper around the astrology tool so that:
@@ -146,7 +146,14 @@ export async function POST(req: Request) {
     const result = streamText({
       model: MODEL,
       system: SYSTEM_PROMPT,
-      messages: convertToModelMessages(messages.slice(-20)),
+      messages: convertToModelMessages((() => {
+        const sliced = messages.slice(-10);
+        // If the first message is a tool result (orphaned), drop it
+        if (sliced.length > 0 && (sliced[0].role as string) === 'tool') {
+          return sliced.slice(1);
+        }
+        return sliced;
+      })()),
       tools: {
         webSearch,
         vectorDatabaseSearch,
