@@ -1,24 +1,24 @@
 Name,Date of Birth,Time of Birth,Place of Birth,Prompt
 New CSV User,15/08/1947,00:00,Mumbai,Testing new CSV format
-Hitarth Talavia,undefined,undefined,ahmedabad,[Language: English] Tell me about my career
+Group A8,undefined,undefined,ahmedabad,[Language: English] Tell me about my career
 BD User 2,10/10/2000,15:45,Bangalore,Testing birth details in CSV retry
-Hitarth Talavia,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about my career
-Hitarth Talavia,07/02/2002,22:00,ahmedabad,[Language: English] Tell me more.
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about my career
+Group A8,07/02/2002,22:00,ahmedabad,[Language: English] Tell me more.
 Redis User,01/01/2024,12:00,Cloud,Testing Redis storage
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career!! and about my health
-Yatharth,10/10/1999,19:19,Indore,[Language: English] Tell me about my life.
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career!! and about my health
+Group A8,10/10/1999,19:19,Indore,[Language: English] Tell me about my life.
 Sheets User,02/02/2024,14:00,Web,Testing Google Sheets storage
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career
 Debug User,03/03/2024,15:00,Console,Debug test for Google Sheets
 Fix User,04/04/2024,16:00,Codebase,Testing Google Sheets Fix
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] When will I get placed?
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about my career
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] When will I get placed?
 Redis Debugger,05/05/2024,17:00,Log,Redis Debug Message
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,"[Language: English] Tell me about my career, panditji"
+Group A8,07/02/2001,22:00,Ahmedabad,"[Language: English] Tell me about my career, panditji"
 Unknown,//,:,Unknown,[Language: English] hello
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] Hello
-hitarth talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
-hitarth talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] Hello
+Group A8 talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8 talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
 Unknown,//,:,Unknown,[Language: English] hello
 Unknown,//,:,Unknown,[Language: English] hello
 Unknown,//,:,Unknown,[Language: English] Hello
@@ -33,7 +33,7 @@ Unknown,//,:,Unknown,[Language: English] Tell me about Lal Kitab Houses
 Unknown,//,:,Unknown,[Language: English] Tell me about Sade Sati Status
 Unknown,//,:,Unknown,[Language: English] Tell me about Ascendant Report
 Unknown,//,:,Unknown,[Language: English] hello
-hitarth talavia,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Lal Kitab Debts
+Group A8 talavia,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Lal Kitab Debts
 Unknown,//,:,Unknown,[Language: English] Tell me about Business opening
 Unknown,//,:,Unknown,[Language: English] Tell me about Money
 Unknown,//,:,Unknown,[Language: English] Tell me about Good investment days
@@ -54,30 +54,30 @@ Unknown,//,:,Unknown,[Language: English] hello
 Unknown,//,:,Unknown,[Language: English] yo
 Unknown,//,:,Unknown,[Language: English] Tell me about Weaknesses
 Unknown,//,:,Unknown,[Language: English] hello
-Hitarth Talavia,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Hitarth Talavia. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-Hitarth Talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
-Hitarth Talavia,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Good investment days
-Hitarth Talavia,07/02/2001,22:00,ahmedabad,[Language: English] hello
-Hitarth Talavia,07/05/2001,22:00,ahmedabad,"[Language: English] My name is Hitarth Talavia. My date of birth is 07-05-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-Hitarth,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Hitarth. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Business opening
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] yo
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] hello
-Hitarth,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Hitarth. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] hello
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Kundli matching
-Hitarth,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Suitable careers
-hitarth,22/12/1999,22:00,ahmedabad,"[Language: English] My name is hitarth. My date of birth is 22-12-1999 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Stress cycles
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about my marriage?
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] will i get a girlfriend in 2026?
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] will i have an arranged marriage or love marriage?
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Good investment days
-hitarth,22/12/1999,22:00,ahmedabad,"[Language: English] Great, I think now your UI works pretty well"
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Kundli matching
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Breakup guidance
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Breakup guidance
-hitarth,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Delay causes & remedies
+Group A8,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Group A8. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Good investment days
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8,07/05/2001,22:00,ahmedabad,"[Language: English] My name is Group A8. My date of birth is 07-05-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Group A8. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Business opening
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] yo
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8,07/02/2001,22:00,ahmedabad,"[Language: English] My name is Group A8. My date of birth is 07-02-2001 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] hello
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Kundli matching
+Group A8,07/02/2001,22:00,ahmedabad,[Language: English] Tell me about Suitable careers
+Group A8,22/12/1999,22:00,ahmedabad,"[Language: English] My name is Group A8. My date of birth is 22-12-1999 at 22:00. I was born in ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Stress cycles
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about my marriage?
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] will i get a girlfriend in 2026?
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] will i have an arranged marriage or love marriage?
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Good investment days
+Group A8,22/12/1999,22:00,ahmedabad,"[Language: English] Great, I think now your UI works pretty well"
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Kundli matching
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Breakup guidance
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Breakup guidance
+Group A8,22/12/1999,22:00,ahmedabad,[Language: English] Tell me about Delay causes & remedies
 hit,11/11/1111,11:11,hit,"[Language: English] My name is hit. My date of birth is 11-11-1111 at 11:11. I was born in hit. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
 hit,11/11/1111,11:11,hit,[Language: English] Tell me about Low-vitality periods
 hit,11/11/1111,11:11,hit,[Language: English] Tell me about High-risk periods
@@ -91,7 +91,7 @@ hit,11/11/1999,11:11,mumbai,[Language: English] Tell me about Stress cycles
 hit,11/11/1999,11:11,mumbai,[Language: English] Tell me about High-risk periods
 hit,11/11/1999,11:11,mumbai,[Language: English] Tell me about Kalsarpa Dosha
 hit,11/11/1999,11:11,mumbai,[Language: English] Tell me about Location Details
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,"[Language: English] My name is Hitarth Talavia. My date of birth is 07-02-2001 at 22:00. I was born in Ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-Hitarth Talavia,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about Stress cycles
+Group A8,07/02/2001,22:00,Ahmedabad,"[Language: English] My name is Group A8. My date of birth is 07-02-2001 at 22:00. I was born in Ahmedabad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,22:00,Ahmedabad,[Language: English] Tell me about Stress cycles
 huiui,hiuh/hu/iuh,uih:uih,uhiu,"[Language: English] My name is huiui. My date of birth is hiuh-hu-iuh at uih:uih. I was born in uhiu. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
-hitarth,07/02/2001,10:11,abad,"[Language: English] My name is hitarth. My date of birth is 07-02-2001 at 10:11. I was born in abad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."
+Group A8,07/02/2001,10:11,abad,"[Language: English] My name is Group A8. My date of birth is 07-02-2001 at 10:11. I was born in abad. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with."

@@ -1117,7 +1117,7 @@ function Chat() {
 
               <div className="flex items-center gap-1 md:gap-2">
                 <span style={{ opacity: 0.7 }}>
-                  © Hitarth Talavia & Yatharth Shah
+                  © Group A8
                 </span>
                 <Link href="/terms" className="underline">
                   Terms of Use

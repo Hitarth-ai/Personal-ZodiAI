@@ -121,7 +121,7 @@ export default function Terms() {
                     <h3 className="text-xl font-semibold">Data Privacy and Security</h3>
                     <ol className="list-decimal list-inside space-y-3">
                         <li className="text-gray-700">
-                            <span className="font-semibold">No Owner Access:</span> The information you provide is not stored anywhere, and Hitarth or Yatharth cannot review your conversations.
+                            <span className="font-semibold">No Owner Access:</span> The information you provide is not stored anywhere, and Group A8 cannot review your conversations.
                         </li>
                         <li className="text-gray-700">
                             <span className="font-semibold">Possible Third-Party Review:</span> Collaborators, partners, or affiliated entities may review interactions solely for improving the AI chatbot, developing course materials, or conducting research.
