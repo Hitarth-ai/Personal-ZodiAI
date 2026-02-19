@@ -44,6 +44,7 @@
 }
 
 :root {
+  scroll-behavior: smooth;
   --radius: 0.625rem;
   --background: oklch(0.995 0 0);
   --foreground: oklch(0.145 0 0);
@@ -76,6 +77,78 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* STRICT CONTRAST SYSTEM */
+
+  /* LIGHT SURFACES */
+  --surface-light: #FFF2E2;
+  --surface-light-2: #FDE3C7;
+  --border-light: rgba(94, 42, 15, 0.18);
+
+  /* TEXT ON LIGHT (Must be DARK) */
+  /* TEXT ON LIGHT (Must be DARK) */
+  --text-light-primary: #120A08;
+  /* Almost Black */
+  --text-light-body: #2A0F0B;
+  /* Deep Brown (Old Primary) */
+  --text-light-secondary: #3E1C0A;
+  /* Dark Brown */
+  --text-light-muted: #5E2A0F;
+  /* Solid Medium Brown (No Opacity) */
+
+  /* DARK SURFACES */
+  --surface-dark: #120A08;
+  --surface-dark-2: #2A0F0B;
+  --border-dark: rgba(255, 242, 226, 0.12);
+
+  /* TEXT ON DARK (Must be LIGHT) */
+  --text-dark-primary: #FFF2E2;
+  --text-dark-secondary: rgba(255, 242, 226, 0.82);
+  --text-dark-muted: rgba(255, 242, 226, 0.68);
+
+  /* BRAND ACCENTS */
+  --brand-primary: #DE6A13;
+  --brand-secondary: #F9BA34;
+  --cta: #BD3E11;
+  --icon: #5E2A0F;
+
+  /* Legacy COMPATIBILITY - Mapping to new system where possible */
+  --color-warm-cream: var(--surface-light);
+  --color-skin-beige: var(--surface-light-2);
+  --color-saffron-orange: var(--brand-primary);
+  --color-turmeric-yellow: var(--brand-secondary);
+  --color-tilak-red: var(--cta);
+  --color-bead-brown: var(--text-light-secondary);
+  --color-plum-dark: var(--surface-dark);
+
+  /* GLOBAL BACKGROUND */
+  --bg-landing: linear-gradient(180deg, #120A08 0%, #2A0F0B 100%);
+
+  /* UI Elements */
+  --nav-bg: var(--surface-dark);
+  --card-border: var(--border-light);
+
+  /* Design System Tokens */
+  --radius-card: 24px;
+  --shadow-card: 0 10px 30px -5px rgba(42, 18, 8, 0.15);
+}
+
+@layer components {
+  .btn-primary {
+    @apply h-11 px-6 rounded-full bg-[var(--cta)] text-white hover:brightness-110 transition-all duration-200 font-medium border border-transparent;
+  }
+
+  .btn-secondary {
+    @apply h-11 px-6 rounded-full bg-transparent border-2 border-[var(--brand-primary)] text-[var(--brand-primary)] hover:bg-[var(--brand-primary)]/10 transition-all duration-200 font-medium;
+  }
+
+  .card-cream {
+    @apply bg-[var(--surface-light)] rounded-[var(--radius-card)] shadow-[var(--shadow-card)] border border-[var(--border-light)];
+  }
+
+  .badge-system {
+    @apply bg-[var(--brand-secondary)] text-[var(--text-light-primary)] text-sm font-medium px-3 py-1 rounded-full;
+  }
 }
 
 .dark {
@@ -116,10 +189,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
-  
+
   .single-char-link {
     @apply bg-card text-card-foreground px-2 py-1 rounded-full hover:underline hover:scale-105 transition-all duration-100 !text-foreground !no-underline border-input border;
   }
