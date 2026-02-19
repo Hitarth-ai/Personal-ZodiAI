@@ -112,10 +112,7 @@ export default function LandingPage() {
                         <div className="flex items-center gap-4 border-l border-[var(--color-warm-cream)]/10 pl-6">
 
 
-                            <a href="#help" className="text-[var(--text-light-secondary)] hover:text-[var(--text-light-primary)] transition-colors text-sm font-medium flex items-center gap-1">
-                                <HelpCircle size={16} />
-                                Help
-                            </a>
+
 
                             <Link
                                 href="/chat"
@@ -188,10 +185,7 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        <a href="#help" className="flex items-center gap-2 px-2 py-2 text-[var(--text-light-secondary)] font-medium">
-                            <HelpCircle size={18} />
-                            Help Center
-                        </a>
+
 
                         <Link
                             href="/chat"
@@ -967,7 +961,7 @@ export default function LandingPage() {
                         <div>
                             <ul className="flex flex-wrap justify-center gap-6 text-[var(--text-dark-secondary)] font-medium text-sm">
                                 <li><Link href="/terms" className="hover:text-[var(--brand-secondary)] transition-colors">Terms of Use</Link></li>
-                                <li><Link href="/privacy" className="hover:text-[var(--brand-secondary)] transition-colors">Privacy Policy</Link></li>
+
                                 <li><a href="mailto:support@zodiai.app" className="hover:text-[var(--brand-secondary)] transition-colors">Contact</a></li>
                             </ul>
                         </div>
