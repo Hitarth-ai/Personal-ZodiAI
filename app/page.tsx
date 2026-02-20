@@ -132,7 +132,7 @@ export default function LandingPage() {
                             Start Chat
                         </Link>
                         <button
-                            className="p-2 text-[var(--color-warm-cream)] hover:bg-[var(--color-warm-cream)]/5 rounded-full transition-colors"
+                            className={`p-2 rounded-full transition-colors ${scrolled || isMobileMenuOpen ? "text-[var(--color-warm-cream)] hover:bg-[var(--color-warm-cream)]/10" : "text-[var(--text-light-primary)] hover:bg-[var(--text-light-primary)]/10"}`}
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             aria-label="Toggle menu"
                         >
@@ -162,27 +162,6 @@ export default function LandingPage() {
                                     {link.name}
                                 </a>
                             ))}
-                        </div>
-
-                        <div className="flex items-center justify-between px-2">
-                            <div className="flex items-center gap-2 text-[var(--text-light-secondary)]">
-                                <Globe size={18} />
-                                <span className="font-medium">Language</span>
-                            </div>
-                            <div className="flex gap-2">
-                                {["English", "Hindi"].map((l) => (
-                                    <button
-                                        key={l}
-                                        onClick={() => setLang(l)}
-                                        className={`px-3 py-1 rounded-full text-sm border transition-colors ${lang === l
-                                            ? "bg-[var(--brand-secondary)]/10 border-[var(--brand-secondary)] text-[var(--brand-secondary)]"
-                                            : "border-transparent text-[var(--text-light-secondary)]"
-                                            }`}
-                                    >
-                                        {l}
-                                    </button>
-                                ))}
-                            </div>
                         </div>
 
 
@@ -224,7 +203,7 @@ export default function LandingPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
-                                className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 tracking-tight leading-[1.1] text-[#3E1C0A]"
+                                className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 md:mb-6 tracking-tight leading-[1.1] text-[#3E1C0A]"
                             >
                                 Your personal AI <br />
                                 <span>Panditji. 24/7.</span>
@@ -234,7 +213,7 @@ export default function LandingPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.4 }}
-                                className="text-lg md:text-xl mb-8 max-w-xl mx-auto lg:mx-0 text-[#3E1C0A] leading-relaxed font-medium"
+                                className="text-base md:text-xl mb-6 md:mb-8 max-w-xl mx-auto lg:mx-0 text-[#3E1C0A] leading-relaxed font-medium"
                             >
                                 Honest, instant Vedic guidance for your daily life. No appointments, just clarity.
                             </motion.p>
@@ -250,8 +229,8 @@ export default function LandingPage() {
                                     "Approximate birth time is okay",
                                     "Saved locally in your browser, never shared"
                                 ].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3 text-[var(--text-light-body)]">
-                                        <CheckCircle size={18} className="mt-1 text-[var(--brand-primary)] flex-shrink-0" />
+                                    <li key={i} className="flex items-start gap-3 text-sm md:text-base text-[var(--text-light-body)]">
+                                        <CheckCircle size={18} className="mt-0.5 md:mt-1 text-[var(--brand-primary)] flex-shrink-0" />
                                         <span>{item}</span>
                                     </li>
                                 ))}
@@ -318,86 +297,86 @@ export default function LandingPage() {
                                     </div>
 
                                     {/* Browser Content */}
-                                    <div className="p-6 md:p-8 bg-gradient-to-b from-[#2A1208] to-[#1a0f0a]">
-                                        <div className="text-center mb-6">
-                                            <h3 className="text-xl font-bold text-[var(--color-warm-cream)] mb-1">ZodiAI – Your AI Panditji</h3>
-                                            <p className="text-sm text-[var(--color-warm-cream)]/60">Gentle Vedic insights — not deterministic predictions.</p>
+                                    <div className="p-4 md:p-8 bg-gradient-to-b from-[#2A1208] to-[#1a0f0a]">
+                                        <div className="text-center mb-4 md:mb-6">
+                                            <h3 className="text-lg md:text-xl font-bold text-[var(--color-warm-cream)] mb-1">ZodiAI – Your AI Panditji</h3>
+                                            <p className="text-xs md:text-sm text-[var(--color-warm-cream)]/60">Gentle Vedic insights — not deterministic predictions.</p>
                                         </div>
 
-                                        <div className="bg-[var(--surface-light)] rounded-2xl p-6 shadow-lg text-[var(--color-bead-brown)]">
-                                            <h4 className="font-bold mb-4 flex items-center gap-2 text-sm uppercase tracking-wider opacity-70">
-                                                <span className="w-6 h-6 rounded-full bg-[var(--brand-secondary)]/10 flex items-center justify-center text-xs">1</span>
+                                        <div className="bg-[var(--surface-light)] rounded-2xl p-3 md:p-6 shadow-lg text-[var(--color-bead-brown)]">
+                                            <h4 className="font-bold mb-2 md:mb-4 flex items-center gap-2 text-xs md:text-sm uppercase tracking-wider opacity-70">
+                                                <span className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[var(--brand-secondary)]/10 flex items-center justify-center text-[10px] md:text-xs">1</span>
                                                 Enter your birth details
                                             </h4>
 
-                                            <div className="space-y-3">
+                                            <div className="space-y-2 md:space-y-3">
                                                 <input
                                                     type="text"
                                                     placeholder="Name"
                                                     value={demoName}
                                                     onChange={(e) => setDemoName(e.target.value)}
-                                                    className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg w-full border border-[var(--brand-secondary)]/10 px-3 text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                    className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg w-full border border-[var(--brand-secondary)]/10 px-2 md:px-3 text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                 />
-                                                <div className="flex gap-3">
+                                                <div className="flex gap-2 md:gap-3">
                                                     <input
                                                         type="text"
                                                         placeholder="Birth City"
                                                         value={demoCity}
                                                         onChange={(e) => setDemoCity(e.target.value)}
-                                                        className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg flex-1 border border-[var(--brand-secondary)]/10 px-3 text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                        className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg flex-1 border border-[var(--brand-secondary)]/10 px-2 md:px-3 text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                     />
-                                                    <div className="flex gap-1 w-1/3">
+                                                    <div className="flex gap-1 md:gap-1 w-1/3">
                                                         <input
                                                             type="text"
                                                             placeholder="DD"
                                                             value={demoDay}
                                                             onChange={(e) => setDemoDay(e.target.value)}
-                                                            className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                            className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                         />
                                                         <input
                                                             type="text"
                                                             placeholder="MM"
                                                             value={demoMonth}
                                                             onChange={(e) => setDemoMonth(e.target.value)}
-                                                            className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                            className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                         />
                                                     </div>
                                                 </div>
-                                                <div className="flex gap-3">
+                                                <div className="flex gap-2 md:gap-3">
                                                     <input
                                                         type="text"
                                                         placeholder="YYYY"
                                                         value={demoYear}
                                                         onChange={(e) => setDemoYear(e.target.value)}
-                                                        className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg flex-1 border border-[var(--brand-secondary)]/10 px-3 text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                        className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg flex-1 border border-[var(--brand-secondary)]/10 px-2 md:px-3 text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                     />
-                                                    <div className="flex gap-1 flex-1">
+                                                    <div className="flex gap-1 md:gap-1 flex-1">
                                                         <input
                                                             type="text"
                                                             placeholder="HH"
                                                             value={demoHour}
                                                             onChange={(e) => setDemoHour(e.target.value)}
-                                                            className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                            className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                         />
                                                         <input
                                                             type="text"
                                                             placeholder="MM"
                                                             value={demoMinute}
                                                             onChange={(e) => setDemoMinute(e.target.value)}
-                                                            className="h-10 bg-[var(--brand-secondary)]/5 rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
+                                                            className="h-8 md:h-10 bg-[var(--brand-secondary)]/5 rounded-xl md:rounded-lg w-full border border-[var(--brand-secondary)]/10 px-1 text-center text-xs md:text-sm focus:outline-none focus:border-[var(--brand-secondary)]/30 text-[#3E1C0A] placeholder-[var(--color-bead-brown)]/40"
                                                         />
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="mt-4 flex items-start gap-2 text-xs text-[var(--color-bead-brown)] bg-[var(--brand-secondary)]/5 p-2 rounded">
+                                            <div className="mt-2 text-[10px] md:mt-4 flex items-start gap-2 md:text-xs text-[var(--color-bead-brown)] bg-[var(--brand-secondary)]/5 p-2 rounded">
                                                 <Lock size={12} className="mt-0.5 flex-shrink-0" />
-                                                <p>This only personalises replies and stays in your local cache, never shared.</p>
+                                                <p className="leading-tight md:leading-normal">This only personalises replies and stays in your local cache, never shared.</p>
                                             </div>
 
                                             <button
                                                 onClick={handleDemoSubmit}
-                                                className="w-full mt-4 bg-[var(--color-tilak-red)] text-white font-medium py-3 rounded-xl shadow-md text-sm hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                                                className="w-full mt-2 md:mt-4 h-8 md:h-auto bg-[var(--color-tilak-red)] text-white font-medium py-1 md:py-3 rounded-full md:rounded-xl shadow-md text-xs md:text-sm hover:shadow-lg transition-shadow disabled:opacity-50 disabled:cursor-not-allowed"
                                                 disabled={!demoName || !demoDay || !demoMonth || !demoYear}
                                             >
                                                 Send details to ZodiAI
@@ -412,64 +391,64 @@ export default function LandingPage() {
             </section>
 
             {/* Trust Strip */}
-            <div className="bg-[var(--surface-light)] py-6 border-y border-[var(--border-light)]">
+            <div className="bg-[var(--surface-light)] py-4 md:py-6 border-y border-[var(--border-light)]">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1280px]">
                     <div className="flex items-center justify-center gap-6 text-[var(--text-light-primary)]">
-                        <p className="font-medium text-center text-lg md:text-xl text-[var(--text-light-primary)]">Private by default. No doom predictions. Clear next steps.</p>
+                        <p className="font-medium text-center text-sm md:text-xl text-[var(--text-light-primary)]">Private by default. No doom predictions. Clear next steps.</p>
                     </div>
                 </div>
             </div>
 
             {/* Features Snapshot - "What you get" */}
-            <section className="py-20 md:py-28 bg-[var(--surface-light)]">
+            <section className="py-16 md:py-28 bg-[var(--surface-light)]">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-[var(--text-light-primary)]">What you get</h2>
-                        <div className="h-1 w-20 bg-[var(--brand-primary)] mx-auto rounded-full"></div>
+                    <div className="text-center mb-10 md:mb-16">
+                        <h2 className="text-2xl md:text-4xl font-bold mb-3 md:mb-4 text-[var(--text-light-primary)]">What you get</h2>
+                        <div className="h-1 w-16 md:w-20 bg-[var(--brand-primary)] mx-auto rounded-full"></div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div className="card-cream p-6 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-4">
-                                <Target size={24} />
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+                        <div className="card-cream p-4 md:p-6 flex flex-col items-center text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-3 md:mb-4">
+                                <Target size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--text-light-primary)] text-lg mb-2">Clear guidance</h3>
-                            <p className="text-[var(--text-light-secondary)] text-sm">What’s happening, why it’s happening, what to do next.</p>
+                            <h3 className="font-bold text-[var(--text-light-primary)] text-sm md:text-lg mb-1 md:mb-2">Clear guidance</h3>
+                            <p className="text-[var(--text-light-secondary)] text-xs md:text-sm">What’s happening, why it’s happening, what to do next.</p>
                         </div>
 
-                        <div className="card-cream p-6 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-4">
-                                <Clock size={24} />
+                        <div className="card-cream p-4 md:p-6 flex flex-col items-center text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-3 md:mb-4">
+                                <Clock size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--text-light-primary)] text-lg mb-2">Timing lens</h3>
-                            <p className="text-[var(--text-light-secondary)] text-sm">Good windows vs avoid windows, explained simply.</p>
+                            <h3 className="font-bold text-[var(--text-light-primary)] text-sm md:text-lg mb-1 md:mb-2">Timing lens</h3>
+                            <p className="text-[var(--text-light-secondary)] text-xs md:text-sm">Good windows vs avoid windows, explained simply.</p>
                         </div>
 
-                        <div className="card-cream p-6 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-4">
-                                <Repeat size={24} />
+                        <div className="card-cream p-4 md:p-6 flex flex-col items-center text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-3 md:mb-4">
+                                <Repeat size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--text-light-primary)] text-lg mb-2">Personal patterns</h3>
-                            <p className="text-[var(--text-light-secondary)] text-sm">Strengths, blind spots, recurring loops.</p>
+                            <h3 className="font-bold text-[var(--text-light-primary)] text-sm md:text-lg mb-1 md:mb-2">Personal patterns</h3>
+                            <p className="text-[var(--text-light-secondary)] text-xs md:text-sm">Strengths, blind spots, recurring loops.</p>
                         </div>
 
-                        <div className="card-cream p-6 flex flex-col items-center text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-4">
-                                <Zap size={24} />
+                        <div className="card-cream p-4 md:p-6 flex flex-col items-center text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center mb-3 md:mb-4">
+                                <Zap size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--text-light-primary)] text-lg mb-2">2-minute daily read</h3>
-                            <p className="text-[var(--text-light-secondary)] text-sm">A fast check-in when you feel stuck.</p>
+                            <h3 className="font-bold text-[var(--text-light-primary)] text-sm md:text-lg mb-1 md:mb-2">2-minute check-in</h3>
+                            <p className="text-[var(--text-light-secondary)] text-xs md:text-sm">A fast read when you feel stuck.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             {/* Demo Section - "See how ZodiAI feels" */}
-            <section className="py-20 md:py-28 relative overflow-hidden bg-[var(--surface-light-2)] border-y border-[var(--border-light)]">
+            <section className="py-16 md:py-28 relative overflow-hidden bg-[var(--surface-light-2)] border-y border-[var(--border-light)]">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
-                    <div className="text-center mb-16">
-                        <span className="badge-system mb-4 inline-block">Live Preview</span>
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--text-light-primary)]">See how ZodiAI feels</h2>
+                    <div className="text-center mb-10 md:mb-16">
+                        <span className="badge-system text-xs md:text-sm mb-3 md:mb-4 inline-block">Live Preview</span>
+                        <h2 className="text-2xl md:text-5xl font-bold mb-4 md:mb-6 text-[var(--text-light-primary)]">See how ZodiAI feels</h2>
                     </div>
 
                     <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
@@ -566,21 +545,21 @@ export default function LandingPage() {
 
                         {/* Right: Benefits List */}
                         <div className="flex flex-col justify-center">
-                            <h3 className="text-2xl font-bold text-[var(--text-light-primary)] mb-8">What you get in one answer</h3>
-                            <div className="space-y-6 mb-12">
+                            <h3 className="text-xl md:text-2xl font-bold text-[var(--text-light-primary)] mb-6 md:mb-8">What you get in one answer</h3>
+                            <div className="space-y-4 md:space-y-6 mb-8 md:mb-12">
                                 {[
                                     { title: "Quick summary in 2 lines", desc: "No need to read pages of text. Get the gist immediately.", icon: BookOpen },
                                     { title: "Why this is showing up now", desc: "Understanding the planetary influence behind the feeling.", icon: Target },
                                     { title: "What to do next", desc: "Simple, practical actions to align with the energy.", icon: CheckCircle },
                                     { title: "Timing lens", desc: "Know if this is a good window to act or to pause.", icon: Clock },
                                 ].map((item, i) => (
-                                    <div key={i} className="flex gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-[var(--surface-light)] border border-[var(--border-light)] flex items-center justify-center text-[var(--brand-primary)] flex-shrink-0">
-                                            <item.icon size={20} />
+                                    <div key={i} className="flex gap-3 md:gap-4">
+                                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[var(--surface-light)] border border-[var(--border-light)] flex items-center justify-center text-[var(--brand-primary)] flex-shrink-0">
+                                            <item.icon size={16} className="md:w-5 md:h-5" />
                                         </div>
                                         <div>
-                                            <h4 className="text-[var(--text-light-primary)] font-bold text-lg">{item.title}</h4>
-                                            <p className="text-[var(--text-light-secondary)] text-sm">{item.desc}</p>
+                                            <h4 className="text-[var(--text-light-primary)] font-bold text-base md:text-lg">{item.title}</h4>
+                                            <p className="text-[var(--text-light-secondary)] text-xs md:text-sm">{item.desc}</p>
                                         </div>
                                     </div>
                                 ))}
@@ -607,11 +586,11 @@ export default function LandingPage() {
             </section>
 
             {/* How It Works Section */}
-            <section id="how-it-works" className="py-20 md:py-32 bg-[var(--surface-light)] relative overflow-hidden">
+            <section id="how-it-works" className="py-16 md:py-32 bg-[var(--surface-light)] relative overflow-hidden">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
-                    <div className="text-center mb-20">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--text-light-primary)]">How it works</h2>
-                        <p className="text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
+                    <div className="text-center mb-12 md:mb-20">
+                        <h2 className="text-2xl md:text-5xl font-bold mb-3 md:mb-6 text-[var(--text-light-primary)]">How it works</h2>
+                        <p className="text-sm md:text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
                             Simple, private, and designed for your peace of mind.
                         </p>
                     </div>
@@ -652,14 +631,14 @@ export default function LandingPage() {
                                 },
                             ].map((step, i) => (
                                 <div key={i} className="flex flex-col items-center text-center group">
-                                    <div className="w-20 h-20 rounded-full bg-[var(--surface-light)] border-4 border-[var(--brand-primary)] shadow-[0_0_0_2px_rgba(222,106,19,0.1)] flex items-center justify-center text-[var(--brand-primary)] mb-6 z-10 relative group-hover:scale-110 transition-transform duration-300">
-                                        <step.icon size={32} />
-                                        <div className="absolute top-0 right-0 bg-[var(--brand-secondary)] text-[var(--text-light-primary)] w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border-2 border-[var(--surface-light)]">
+                                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-[var(--surface-light)] border-4 border-[var(--brand-primary)] shadow-[0_0_0_2px_rgba(222,106,19,0.1)] flex items-center justify-center text-[var(--brand-primary)] mb-4 md:mb-6 z-10 relative group-hover:scale-110 transition-transform duration-300">
+                                        <step.icon size={24} className="md:w-8 md:h-8" />
+                                        <div className="absolute top-0 right-0 bg-[var(--brand-secondary)] text-[var(--text-light-primary)] w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center text-[10px] md:text-xs font-bold border-2 border-[var(--surface-light)]">
                                             {i + 1}
                                         </div>
                                     </div>
-                                    <h3 className="text-xl font-bold text-[var(--text-light-primary)] mb-3">{step.title}</h3>
-                                    <p className="text-[var(--text-light-secondary)] text-sm leading-relaxed max-w-[250px] mx-auto">
+                                    <h3 className="text-lg md:text-xl font-bold text-[var(--text-light-primary)] mb-2 md:mb-3">{step.title}</h3>
+                                    <p className="text-[var(--text-light-secondary)] text-xs md:text-sm leading-relaxed max-w-[250px] mx-auto">
                                         {step.desc}
                                     </p>
                                     {step.extra}
@@ -671,34 +650,34 @@ export default function LandingPage() {
             </section>
 
             {/* Use Cases            {/* Features Snapshot */}
-            <section id="features" className="py-20 md:py-32 bg-[var(--bg-landing)]">
+            <section id="features" className="py-16 md:py-32 bg-[var(--bg-landing)]">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
-                    <div className="text-center mb-16">
-                        <span className="text-[var(--brand-secondary)] font-bold tracking-widest uppercase text-sm mb-2 block">Features</span>
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--text-light-primary)]">More than just a horoscope.</h2>
-                        <p className="text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
+                    <div className="text-center mb-10 md:mb-16">
+                        <span className="text-[var(--brand-secondary)] font-bold tracking-widest uppercase text-[10px] md:text-sm mb-2 block">Features</span>
+                        <h2 className="text-2xl md:text-5xl font-bold mb-3 md:mb-6 text-[var(--text-light-primary)]">More than just a horoscope.</h2>
+                        <p className="text-sm md:text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
                             ZodiAI combines ancient Vedic wisdom with modern AI to give you specific, actionable advice.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {[
                             { title: "Before a big decision", question: "Should I take this role?", icon: HelpCircle },
                             { title: "Timing feels off", question: "Why is everything delayed lately?", icon: Clock },
                             { title: "Daily direction", question: "What should I focus on today?", icon: Sun },
                             { title: "Relationship confusion", question: "Why do we clash on the same thing?", icon: Heart },
-                            { title: "Money noise", question: "Should I be cautious this month?", icon: Wallet },
+                            { title: "Money noise", question: "Should I be cautious this month?", icon: Lock },
                             { title: "Calm reset", question: "Give me a simple grounding read.", icon: Moon },
                         ].map((useCase, i) => (
-                            <div key={i} className="card-cream p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-[var(--border-light)] flex flex-col h-full bg-[var(--surface-light)] text-[var(--text-light-primary)]">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="p-2 rounded-lg bg-[var(--surface-light-2)]/50 text-[var(--text-light-secondary)]">
-                                        <useCase.icon size={20} />
+                            <div key={i} className="card-cream p-5 md:p-8 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-[var(--border-light)] flex flex-col h-full bg-[var(--surface-light)] text-[var(--text-light-primary)]">
+                                <div className="flex items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                                    <div className="p-1.5 md:p-2 rounded-lg bg-[var(--surface-light-2)]/50 text-[var(--text-light-secondary)]">
+                                        <useCase.icon size={18} className="md:w-5 md:h-5" />
                                     </div>
-                                    <h3 className="font-bold text-[var(--text-light-primary)] text-lg">{useCase.title}</h3>
+                                    <h3 className="font-bold text-[var(--text-light-primary)] text-sm md:text-lg">{useCase.title}</h3>
                                 </div>
-                                <div className="mt-auto bg-[var(--surface-light-2)]/30 p-4 rounded-xl border border-[var(--border-light)]">
-                                    <p className="text-[var(--text-light-secondary)] italic font-medium">"{useCase.question}"</p>
+                                <div className="mt-auto bg-[var(--surface-light-2)]/30 p-3 md:p-4 rounded-xl border border-[var(--border-light)]">
+                                    <p className="text-[var(--text-light-secondary)] italic text-xs md:text-base font-medium">"{useCase.question}"</p>
                                 </div>
                             </div>
                         ))}
@@ -709,10 +688,10 @@ export default function LandingPage() {
 
 
             {/* Testimonials */}
-            <section id="testimonials" className="py-20 md:py-32 scroll-mt-20">
+            <section id="testimonials" className="py-16 md:py-32 scroll-mt-20">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-16 md:mb-20 text-center text-[var(--text-light-primary)]">Voices from our Community</h2>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                    <h2 className="text-2xl md:text-5xl font-bold mb-10 md:mb-20 text-center text-[var(--text-light-primary)]">Voices from our Community</h2>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                         <TestimonialCard
                             quote="I was skeptical at first, but the depth of insight regarding my moon sign was incredible. It felt like talking to a wise elder."
                             author="Aarav K."
@@ -736,41 +715,41 @@ export default function LandingPage() {
             <section id="privacy-section" className="py-12 md:py-20 bg-[var(--surface-light-2)]">
                 <div className="container mx-auto px-4 md:px-12 max-w-[1200px]">
                     <div className="max-w-4xl mx-auto text-center relative z-10">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--brand-secondary)]/10 border border-[var(--brand-secondary)]/20 text-[#3E1C0A] text-sm font-medium mb-6 backdrop-blur-sm">
-                            <Sparkles size={14} className="text-[var(--brand-secondary)]" />
+                        <div className="inline-flex items-center gap-1.5 md:gap-2 px-2.5 md:px-3 py-1 rounded-full bg-[var(--brand-secondary)]/10 border border-[var(--brand-secondary)]/20 text-[#3E1C0A] text-xs md:text-sm font-medium mb-4 md:mb-6 backdrop-blur-sm">
+                            <Sparkles size={12} className="text-[var(--brand-secondary)] md:w-[14px] md:h-[14px]" />
                             <span>Vedic Astrology • AI-Powered • Private</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight text-[#3E1C0A]">
+                        <h1 className="text-3xl md:text-7xl font-bold mb-4 md:mb-6 tracking-tight leading-tight text-[#3E1C0A]">
                             Your personal AI astrologer. <span className="text-[var(--brand-secondary)]">24/7.</span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-[#3E1C0A] mb-10 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-base md:text-2xl text-[#3E1C0A] mb-8 md:mb-10 max-w-2xl mx-auto leading-relaxed">
                             Honest, instant Vedic guidance for your daily life. No appointments, just clarity.
                         </p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-8 rounded-2xl text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-4">
-                                <Save size={24} />
+                    <div className="grid md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
+                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-6 md:p-8 rounded-2xl text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-3 md:mb-4">
+                                <Save size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-2">Local storage</h3>
-                            <p className="text-[var(--color-warm-cream)]/60 text-sm leading-relaxed">Saved only in your browser (cache), never shared with anyone else.</p>
+                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-1.5 md:mb-2 text-sm md:text-base">Local storage</h3>
+                            <p className="text-[var(--color-warm-cream)]/60 text-xs md:text-sm leading-relaxed">Saved only in your browser (cache), never shared with anyone else.</p>
                         </div>
 
-                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-8 rounded-2xl text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-4">
-                                <RotateCcw size={24} />
+                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-6 md:p-8 rounded-2xl text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-3 md:mb-4">
+                                <RotateCcw size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-2">You control it</h3>
-                            <p className="text-[var(--color-warm-cream)]/60 text-sm leading-relaxed">Clear your chat history anytime with a single click. It's your data.</p>
+                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-1.5 md:mb-2 text-sm md:text-base">You control it</h3>
+                            <p className="text-[var(--color-warm-cream)]/60 text-xs md:text-sm leading-relaxed">Clear your chat history anytime with a single click. It's your data.</p>
                         </div>
 
-                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-8 rounded-2xl text-center">
-                            <div className="w-12 h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-4">
-                                <Lock size={24} />
+                        <div className="bg-[var(--color-plum-dark)] border border-[var(--color-warm-cream)]/10 p-6 md:p-8 rounded-2xl text-center">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[var(--color-warm-cream)]/5 flex items-center justify-center text-[var(--color-warm-cream)] mx-auto mb-3 md:mb-4">
+                                <Lock size={20} className="md:w-6 md:h-6" />
                             </div>
-                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-2">Boundaries</h3>
-                            <p className="text-[var(--color-warm-cream)]/60 text-sm leading-relaxed">For reflection and guidance. Not medical, legal, or financial advice.</p>
+                            <h3 className="font-bold text-[var(--color-warm-cream)] mb-1.5 md:mb-2 text-sm md:text-base">Boundaries</h3>
+                            <p className="text-[var(--color-warm-cream)]/60 text-xs md:text-sm leading-relaxed">For reflection and guidance. Not medical, legal, or financial advice.</p>
                         </div>
                     </div>
                 </div>
@@ -822,18 +801,18 @@ export default function LandingPage() {
                         </div>
 
                         {/* Plus Plan (Waitlist) */}
-                        <div className="bg-[#fffbf5] p-8 rounded-3xl border border-[var(--color-bead-brown)]/10 relative opacity-80 hover:opacity-100 transition-opacity">
-                            <div className="inline-block bg-[var(--color-plum-dark)] text-[var(--color-warm-cream)] text-xs font-bold px-3 py-1 rounded-full mb-4">
+                        <div className="bg-[#fffbf5] p-6 md:p-8 rounded-3xl border border-[var(--color-bead-brown)]/10 relative opacity-80 hover:opacity-100 transition-opacity">
+                            <div className="inline-block bg-[var(--color-plum-dark)] text-[var(--color-warm-cream)] text-[10px] md:text-xs font-bold px-3 py-1 rounded-full mb-3 md:mb-4">
                                 Coming Soon
                             </div>
-                            <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Plus</h3>
-                            <p className="text-[var(--text-secondary)] text-sm mb-6">For deeper self-discovery.</p>
+                            <h3 className="text-xl md:text-2xl font-bold text-[var(--text-primary)] mb-1 md:mb-2 text-[var(--text-light-primary)]">Plus</h3>
+                            <p className="text-[var(--text-secondary)] text-xs md:text-sm mb-4 md:mb-6 text-[var(--text-light-secondary)]">For deeper self-discovery.</p>
 
-                            <div className="text-4xl font-bold text-[var(--text-primary)] mb-8 filter blur-[2px] select-none">
-                                ₹299 <span className="text-lg font-normal">/ month</span>
+                            <div className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-6 md:mb-8 filter blur-[2px] select-none text-[var(--text-light-primary)]">
+                                ₹299 <span className="text-base md:text-lg font-normal">/ month</span>
                             </div>
 
-                            <ul className="space-y-4 mb-8">
+                            <ul className="space-y-3 md:space-y-4 mb-6 md:mb-8">
                                 {[
                                     "Everything in Free",
                                     "Deeper planetary dive & transits",
@@ -841,14 +820,14 @@ export default function LandingPage() {
                                     "Saved summaries & PDF exports",
                                     "Priority access during high traffic"
                                 ].map((feature, i) => (
-                                    <li key={i} className="flex items-center gap-3 text-[var(--text-secondary)] text-sm">
+                                    <li key={i} className="flex items-center gap-3 text-[var(--text-secondary)] text-sm text-[var(--text-light-body)]">
                                         <CheckCircle size={16} className="text-[var(--text-secondary)]/30 flex-shrink-0" />
                                         {feature}
                                     </li>
                                 ))}
                             </ul>
 
-                            <button className="w-full py-3 rounded-xl border-2 border-[var(--text-secondary)]/10 text-[var(--text-secondary)] font-bold hover:bg-[var(--text-secondary)]/5 transition-colors cursor-not-allowed">
+                            <button className="w-full py-2 md:py-3 rounded-xl border-2 border-[var(--text-secondary)]/10 text-[var(--text-secondary)] font-bold hover:bg-[var(--text-secondary)]/5 transition-colors cursor-not-allowed text-xs md:text-sm text-[var(--text-light-secondary)]">
                                 Join Waitlist
                             </button>
                         </div>
@@ -857,42 +836,42 @@ export default function LandingPage() {
             </section>
 
             {/* Final CTA Band */}
-            <div className="bg-[var(--surface-light-2)] border-y-[6px] border-[var(--color-saffron-orange)] py-16 md:py-24">
+            <div className="bg-[var(--surface-light-2)] border-y-[4px] md:border-y-[6px] border-[var(--color-saffron-orange)] py-12 md:py-24">
                 <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-3xl md:text-5xl font-bold text-[var(--text-light-primary)] mb-4">
+                    <h2 className="text-2xl md:text-5xl font-bold text-[var(--text-light-primary)] mb-3 md:mb-4">
                         Ask one question. <br className="md:hidden" /> You will feel the difference.
                     </h2>
-                    <p className="text-lg md:text-xl text-[var(--text-light-body)] mb-10">
+                    <p className="text-base md:text-xl text-[var(--text-light-body)] mb-6 md:mb-10">
                         Gentle Vedic insights, explained simply.
                     </p>
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
                         <Link
                             href="/chat"
-                            className="btn-primary text-xl px-10 py-4 h-auto shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
+                            className="btn-primary text-base md:text-xl px-8 md:px-10 py-3 md:py-4 h-auto shadow-xl hover:shadow-2xl hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2"
                         >
-                            <MessageCircle size={22} />
+                            <MessageCircle size={20} className="md:w-[22px] md:h-[22px]" />
                             Start Chat
                         </Link>
                         <a
                             href="#how-it-works"
-                            className="text-[var(--text-light-primary)] font-bold hover:bg-[var(--text-light-primary)]/5 px-8 py-4 rounded-xl transition-colors flex items-center gap-2"
+                            className="text-[var(--text-light-primary)] text-sm md:text-base font-bold hover:bg-[var(--text-light-primary)]/5 px-6 md:px-8 py-3 md:py-4 rounded-xl transition-colors flex items-center justify-center gap-2"
                         >
                             See Demo
-                            <ArrowRight size={18} />
+                            <ArrowRight size={16} className="md:w-[18px] md:h-[18px]" />
                         </a>
                     </div>
-                    <p className="mt-8 text-xs text-[var(--text-light-muted)]">
+                    <p className="mt-6 md:mt-8 text-[10px] md:text-xs text-[var(--text-light-muted)]">
                         No credit card required. Private by default.
                     </p>
                 </div>
             </div>
 
             {/* FAQ Section */}
-            <section id="faq" className="py-20 md:py-32 bg-[var(--bg-landing)] relative overflow-hidden">
+            <section id="faq" className="py-16 md:py-32 bg-[var(--bg-landing)] relative overflow-hidden">
                 <div className="container mx-auto px-4 md:px-12 max-w-[800px]">
-                    <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-5xl font-bold mb-6 text-[var(--text-light-primary)]">Frequently Asked Questions</h2>
-                        <p className="text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
+                    <div className="text-center mb-10 md:mb-16">
+                        <h2 className="text-2xl md:text-5xl font-bold mb-3 md:mb-6 text-[var(--text-light-primary)]">Frequently Asked Questions</h2>
+                        <p className="text-sm md:text-lg text-[var(--text-light-body)] max-w-2xl mx-auto">
                             Honest answers about how ZodiAI works.
                         </p>
                     </div>
@@ -916,7 +895,7 @@ export default function LandingPage() {
                         />
                         <FAQItem
                             question="Does ZodiAI store my data?"
-                            answer="Your birth details are stored locally in your browser's cache for your convenience. We do not sell your personal data. Conversations are processed by AI but are not used to train public models."
+                            answer="We do not store your data anywhere. Your birth details and chat history remain strictly on your local device (browser cache). While chats are processed by AI to generate insights, they are never saved on our servers or used to train public models."
                         />
                         <FAQItem
                             question="Can I delete my chats?"

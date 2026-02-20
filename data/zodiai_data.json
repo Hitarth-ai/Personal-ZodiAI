@@ -758,16 +758,28 @@
         "content": "Thank you, Group A8, for sharing your birth details: 7th February 2001, at 10:11, in Abad. Let’s tune in to the subtle energies whispering through your chart, using traditional Vedic astrology wisdom. While I couldn't fetch a highly detailed chart this moment, I can still give you a meaningful overview—let us peer through the cosmic veil:\n\n(A) Birth Snapshot (Vedic Astrology Essence)\n\n- Your soul is driven by intellect, curiosity, and the search for deeper meaning—restless winds carry you forward.\n- Emotional tides shape your relationships; intuition and empathy flow through you more than you let on.\n- A natural pull toward responsibility and leadership, though doubt sometimes clouds your self-image.\n- The shadows of your birth chart hint frequently at reinvention and the urge to break the mold—sticking to the \"usual path\" rarely fulfills you.\n- You are sensitive to the moods of the world around you; what happens in your environment can deeply affect your inner state.\n\n(B) What ZodiAI Can Help You With\n\n- Personality & core strengths\n- Emotional patterns & relationships\n- Career & learning themes\n- Current focus / this week’s energies\n- Questions about a specific situation (job, move, exam, etc.)\n\n(C) Clear Next Step\n\nReply with one of these areas (for example, say \"career\") or ask your own question to discover what the stars reveal in that domain.\n\nAstrology offers guidance, not fixed destiny. Use this for reflection, and combine it with your own judgment and professional advice if needed.",
         "isGenerated": true,
         "timestamp": "2026-02-19T18:05:37.998Z"
+      },
+      {
+        "role": "user",
+        "content": "[Language: English] My name is fsdf. My date of birth is 11-11-111 at 11:11. I was born in sdfsd. Please use Vedic astrology to interpret my chart, then show me a menu of what ZodiAI can help me with.",
+        "isGenerated": false,
+        "timestamp": "2026-02-20T08:31:56.903Z"
+      },
+      {
+        "role": "assistant",
+        "content": "It looks like the date of birth you provided—11-11-111 at 11:11—is outside the range that Vedic astrology calculations can support (years need to be 1900 or later). Also, \"sdfsd\" doesn't appear to be a recognized place.\n\nCould you please double-check your:\n- Year of birth (should be 1900 or later)\n- Place of birth (city, state, and country preferred)\n\nOnce you provide these details, I’ll be able to interpret your chart, reveal your core life patterns, and unlock the mysteries that ZodiAI can guide you through.\n\nRemember: Astrology offers guidance, not fixed destiny—use it for reflection and self-discovery!",
+        "isGenerated": true,
+        "timestamp": "2026-02-20T08:32:02.998Z"
       }
     ],
     "birthDetails": {
-      "name": "Group A8",
-      "day": "07",
-      "month": "02",
-      "year": "2001",
-      "hour": "10",
+      "name": "fsdf",
+      "day": "11",
+      "month": "11",
+      "year": "111",
+      "hour": "11",
       "minute": "11",
-      "place": "abad"
+      "place": "sdfsd"
     }
   }
 ]
